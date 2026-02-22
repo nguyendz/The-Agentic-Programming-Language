@@ -1,0 +1,274 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 13 — The Debugging Mindset | The Agentic Programming Language</title>
+<link rel="stylesheet" href="reading.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="book-title">The Agentic Programming Language</a>
+  <div class="chapter-nav">
+    <a href="ch12.html">← Previous</a>
+    <a href="ch14.html">Next →</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <header class="chapter-header">
+    <div class="chapter-label">Chapter 13</div>
+    <h1 class="chapter-title">The Debugging Mindset</h1>
+    <p class="chapter-subtitle">Debug the Prompt, Not the Model</p>
+    <div class="chapter-meta">
+      <span>Part V — The New Engineering Practices</span>
+      <span>7 sections</span>
+    </div>
+  </header>
+
+  <div class="prose">
+
+    <p>When a traditional program produces wrong output, you debug the code. The compiler is not the problem — the code is. The same principle applies to agentic systems: when an agent produces wrong output, you debug the prompt. The model is not the problem — the prompt is.</p>
+    <p>This mindset shift is often the hardest adjustment for experienced engineers. The urge to blame the model is strong, especially when behavior is inconsistent. But inconsistency is also a prompt engineering problem: an underspecified prompt produces inconsistent outputs. The fix is a more precise prompt, not a different model.</p>
+
+    <hr class="section-divider">
+
+    <h2>13.1 &nbsp; The Compiler Doesn't Have Bugs</h2>
+    <p>A veteran developer does not blame the compiler when code does not behave as expected. They inspect the code. The compiler's job is to translate code to instructions faithfully — and it does that faithfully. If the output is wrong, the input (the code) is wrong.</p>
+    <p>An LLM's job is to predict the most probable next token given context — and it does that faithfully. If the output is wrong, the input (the prompt) is wrong — or the context is ambiguous, or the constraints are missing, or the model was asked to do something beyond its actual capability. In the first three cases, fix the prompt. In the fourth, fix the architecture.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Traditional Debugging</th><th>Agentic Debugging</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>"There's a bug in the code"</td><td>"There's an ambiguity in the prompt"</td></tr>
+          <tr><td>Read the stack trace</td><td>Read the reasoning trace</td></tr>
+          <tr><td>Check variable values at failure point</td><td>Check injected context at failure point</td></tr>
+          <tr><td>Write a unit test that reproduces the bug</td><td>Write an eval case that reproduces the failure</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>13.2 &nbsp; Five Failure Categories</h2>
+    <p>Most agent misbehaviors fall into five categories. Each has a diagnostic signal and a fix:</p>
+
+    <h3>1. Vague Instruction</h3>
+    <p>The prompt says what to do but not how. The model fills the gap with its best guess — which may not match your intent.</p>
+    <div class="code-label">Before (Vague)</div>
+    <pre><code>Summarize the customer's issue.</code></pre>
+    <div class="code-label">After (Precise)</div>
+    <pre><code>Summarize the customer's issue in exactly 2 sentences.
+First sentence: state the category (refund / shipping / order status / other).
+Second sentence: state the specific concern in neutral language.</code></pre>
+
+    <h3>2. Missing Constraint</h3>
+    <p>The prompt specifies the happy path but does not specify what to do when conditions are not met. The model attempts to be helpful and exceeds its authority.</p>
+    <div class="code-label">Before (Missing Constraint)</div>
+    <pre><code">Process refund requests for orders within 30 days of delivery.</code></pre>
+    <div class="code-label">After (Constraint Added)</div>
+    <pre><code">Process refund requests ONLY for orders delivered within the past 30 days.
+If the order is older than 30 days: do NOT process the refund.
+Tell the customer the policy window has expired.
+Offer to escalate to a human agent if they wish to appeal.</code></pre>
+
+    <h3>3. Conflicting Instructions</h3>
+    <p>The prompt contains two instructions that can conflict in certain cases. The model resolves the conflict however it sees fit — which may not be what you intended.</p>
+    <div class="code-label">Before (Conflicting)</div>
+    <pre><code">Be concise. Provide a comprehensive explanation of all options available to the customer.</code></pre>
+    <div class="code-label">After (Priority Explicit)</div>
+    <pre><code">Prioritize conciseness: default to 2–3 sentences.
+If the customer asks for more detail or options, then provide a comprehensive explanation.</code></pre>
+
+    <h3>4. No Example Provided</h3>
+    <p>The prompt describes the desired format in words, but the model still guesses at the specifics. Few-shot examples are worth more than paragraphs of description.</p>
+    <div class="code-label">After (With Example)</div>
+    <pre><code">Format your response exactly like this example:
+STATUS: Shipped
+ORDER: ORD-123
+ETA: January 15, 2024
+MESSAGE: Your order is on its way.</code></pre>
+
+    <h3>5. Context Overload</h3>
+    <p>The injected context is too long or too noisy. The relevant information is buried. The model attends to the wrong parts (Chapter 3: lost-in-the-middle problem) and produces an answer based on irrelevant context.</p>
+    <div class="code-label">Fix: Prioritize Context</div>
+    <pre><code">## RELEVANT ORDER DETAILS (use these for your response):
+Order ID: ORD-789
+Status: Processing
+Estimated Ship Date: January 18, 2024
+
+## BACKGROUND (lower priority — only reference if directly asked):
+Customer history: 3 prior orders, all delivered successfully
+Account tier: Standard</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>13.3 &nbsp; The Debugging Process</h2>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 13.1 — Agentic Debugging Flowchart</div>
+      <svg width="680" height="460" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr13" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#374151"/>
+      </marker>
+      <marker id="arr13g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#16a34a"/>
+      </marker>
+      <marker id="arr13r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#dc2626"/>
+      </marker>
+    </defs>
+
+    <!-- Start -->
+    <ellipse cx="340" cy="26" rx="110" ry="20" fill="#1a2744"/>
+    <text x="340" y="31" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Agent produces wrong / unexpected output</text>
+    <line x1="340" y1="46" x2="340" y2="68" stroke="#374151" stroke-width="2" marker-end="url(#arr13)"/>
+
+    <!-- Decision 1: Reproducible? -->
+    <polygon points="340,70 460,100 340,130 220,100" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="340" y="96" font-size="10" font-weight="700" fill="#78350f" text-anchor="middle" font-family="Segoe UI,sans-serif">Is failure</text>
+    <text x="340" y="112" font-size="10" font-weight="700" fill="#78350f" text-anchor="middle" font-family="Segoe UI,sans-serif">reproducible?</text>
+
+    <!-- No branch (stochastic) -->
+    <line x1="460" y1="100" x2="560" y2="100" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arr13r)"/>
+    <text x="508" y="92" font-size="9" fill="#dc2626" text-anchor="middle" font-family="Segoe UI,sans-serif">No</text>
+    <rect x="562" y="78" width="108" height="44" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+    <text x="616" y="98" font-size="9" font-weight="700" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">Run × 5–10</text>
+    <text x="616" y="112" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Measure fail rate</text>
+    <line x1="616" y1="122" x2="616" y2="148" stroke="#374151" stroke-width="1.5" marker-end="url(#arr13)"/>
+    <rect x="564" y="150" width="104" height="44" rx="8" fill="#fef3c7" stroke="#d97706"/>
+    <text x="616" y="170" font-size="9" fill="#92400e" text-anchor="middle" font-family="Segoe UI,sans-serif">If rate &gt;15%:</text>
+    <text x="616" y="183" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">treat as bug</text>
+
+    <!-- Yes branch (deterministic failure) -->
+    <line x1="340" y1="130" x2="340" y2="160" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arr13g)"/>
+    <text x="352" y="148" font-size="9" fill="#16a34a" font-family="Segoe UI,sans-serif">Yes</text>
+
+    <!-- Decision 2: Which layer? -->
+    <polygon points="340,162 460,192 340,222 220,192" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="340" y="188" font-size="10" font-weight="700" fill="#1e40af" text-anchor="middle" font-family="Segoe UI,sans-serif">Which Trilogy</text>
+    <text x="340" y="204" font-size="10" font-weight="700" fill="#1e40af" text-anchor="middle" font-family="Segoe UI,sans-serif">layer is failing?</text>
+
+    <!-- Branch: Prompt -->
+    <line x1="220" y1="192" x2="80" y2="248" stroke="#374151" stroke-width="1.5" marker-end="url(#arr13)"/>
+    <text x="136" y="226" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Prompt</text>
+    <rect x="20" y="250" width="130" height="80" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+    <text x="85" y="270" font-size="9" font-weight="700" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">Prompt Debug</text>
+    <text x="85" y="285" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">1. Isolate in playground</text>
+    <text x="85" y="298" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">2. Add explicit examples</text>
+    <text x="85" y="311" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">3. Add output schema</text>
+    <text x="85" y="324" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">4. Eval against golden set</text>
+
+    <!-- Branch: LLM -->
+    <line x1="340" y1="222" x2="340" y2="248" stroke="#374151" stroke-width="1.5" marker-end="url(#arr13)"/>
+    <text x="352" y="240" font-size="9" fill="#374151" font-family="Segoe UI,sans-serif">LLM</text>
+    <rect x="265" y="250" width="150" height="80" rx="8" fill="#fef3c7" stroke="#d97706"/>
+    <text x="340" y="270" font-size="9" font-weight="700" fill="#78350f" text-anchor="middle" font-family="Segoe UI,sans-serif">LLM Debug</text>
+    <text x="340" y="285" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">1. Try different model</text>
+    <text x="340" y="298" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">2. Adjust temperature</text>
+    <text x="340" y="311" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">3. Reduce context size</text>
+    <text x="340" y="324" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">4. Check token budget</text>
+
+    <!-- Branch: Data -->
+    <line x1="460" y1="192" x2="600" y2="248" stroke="#374151" stroke-width="1.5" marker-end="url(#arr13)"/>
+    <text x="544" y="226" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Data</text>
+    <rect x="530" y="250" width="140" height="80" rx="8" fill="#f3e8ff" stroke="#7c3aed"/>
+    <text x="600" y="270" font-size="9" font-weight="700" fill="#4c1d95" text-anchor="middle" font-family="Segoe UI,sans-serif">Data Debug</text>
+    <text x="600" y="285" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">1. Print raw retrieval</text>
+    <text x="600" y="298" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">2. Check chunk overlap</text>
+    <text x="600" y="311" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">3. Verify embeddings</text>
+    <text x="600" y="324" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">4. Test with static ctx</text>
+
+    <!-- Converge to: Fix + eval -->
+    <line x1="85" y1="330" x2="200" y2="390" stroke="#374151" stroke-width="1.5" marker-end="url(#arr13)"/>
+    <line x1="340" y1="330" x2="340" y2="390" stroke="#374151" stroke-width="1.5" marker-end="url(#arr13)"/>
+    <line x1="600" y1="330" x2="480" y2="390" stroke="#374151" stroke-width="1.5" marker-end="url(#arr13)"/>
+    <rect x="180" y="392" width="320" height="52" rx="10" fill="#1a2744"/>
+    <text x="340" y="412" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Apply fix → run eval suite → confirm pass</text>
+    <text x="340" y="430" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Add failing case to regression set — never lose it</text>
+
+    <rect x="180" y="448" width="320" height="10" rx="4" fill="#16a34a" opacity="0.4"/>
+  </svg>
+      <p class="diagram-caption">Agentic debugging starts with reproducibility, then isolates the failing Trilogy layer. The most important habit: every diagnosed failure gets added to the regression eval set so it can never silently return.</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>13.4 &nbsp; Prompt Versioning</h2>
+    <p>Prompts are code. Like code, they should be version-controlled, and changes should be traceable. A minimal prompt versioning practice:</p>
+    <ul>
+      <li>Every prompt has a version string: <code>SYSTEM_PROMPT_V3_2</code></li>
+      <li>A changelog entry explains what changed, why, and what eval score changed</li>
+      <li>Rolling back is possible: a regression can be diagnosed and reverted</li>
+      <li>The eval suite is run before and after every change — score must not decrease</li>
+    </ul>
+    <p>This practice transforms prompt debugging from "trying random changes and hoping" into engineering: hypothesize, change, measure, decide. The eval is the instrument. The version log is the experiment record.</p>
+
+    <hr class="section-divider">
+
+    <h2>13.5 &nbsp; LLM as Debugging Partner</h2>
+    <p>One of the most underused debugging techniques: ask a different LLM session to diagnose your prompt. Feed it the system prompt, the failing eval case, and the wrong output, and ask: "Why might this prompt produce this output? What ambiguity or missing instruction could cause this specific failure?" LLMs are good at identifying ambiguity in language — they do it by default as part of their inference. Use that capability deliberately.</p>
+
+    <div class="callout">
+      <strong>Debugging Prompt Template:</strong><br><br>
+      I am debugging an AI agent that produced unexpected output. Please identify what in the system prompt may have caused this behavior.<br><br>
+      SYSTEM PROMPT: [paste prompt here]<br>
+      USER MESSAGE: [paste failing input here]<br>
+      ACTUAL OUTPUT: [paste wrong response here]<br>
+      EXPECTED OUTPUT: [paste what it should have said here]<br><br>
+      Identify the most likely cause from these categories: vague instruction / missing constraint / conflicting instructions / no example / context overload. Suggest a minimal targeted fix.
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>13.6 &nbsp; Blame Distribution Matrix</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Failure Location</th><th>Frequency</th><th>Diagnostic Signal</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>System prompt (instruction quality)</td><td>~60%</td><td>Consistent wrong behavior on specific input type</td><td>Add precision, constraints, or examples</td></tr>
+          <tr><td>Injected context (quality/relevance)</td><td>~20%</td><td>Response references wrong order / wrong policy</td><td>Improve retrieval, add context prioritization headers</td></tr>
+          <tr><td>Tool schema (description clarity)</td><td>~10%</td><td>Agent calls wrong tool or wrong parameters</td><td>Improve tool description and parameter naming</td></tr>
+          <tr><td>Model capability gap</td><td>~8%</td><td>Fails even with perfect prompt on every attempt</td><td>Decompose task; change model; add reasoning step</td></tr>
+          <tr><td>Genuine model bug</td><td>~2%</td><td>Reproducible failure with no prompt explanation</td><td>Report to model provider; use different model version</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>13.7 &nbsp; Chapter Summary</h2>
+    <p>Debugging an agent is a disciplined process: isolate, classify, fix specifically, measure. The model is not the starting hypothesis — the prompt is. Ninety percent of agent failures can be fixed without changing the model. The other ten percent require architectural changes or a different model — but you only know which category you are in after you have exhausted the prompt debugging process.</p>
+
+    <div class="core-principle">
+      <div class="core-principle-label">Core Principle — Chapter 13</div>
+      <p>When your agent misbehaves, <strong>you debug the prompt, not the model.</strong> The prompt is the program. Start there.</p>
+    </div>
+
+  </div><!-- /.prose -->
+
+  <nav class="bottom-nav">
+    <a href="ch12.html">
+      <span class="nav-direction">← Previous</span>
+      <span class="nav-title">Chapter 12 — BDD for Agents</span>
+    </a>
+    <a href="ch14.html" class="next">
+      <span class="nav-direction">Next →</span>
+      <span class="nav-title">Chapter 14 — Prompt Injection</span>
+    </a>
+  </nav>
+
+</div><!-- /.page-wrap -->
+
+<footer class="site-copyright">&copy; 2026 Nguyen Ngo &middot; The Agentic Programming Language</footer>
+</body>
+</html>

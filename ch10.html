@@ -1,0 +1,413 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 10 — Design Patterns in Multi-Agent Workflows | The Agentic Programming Language</title>
+<link rel="stylesheet" href="reading.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="book-title">The Agentic Programming Language</a>
+  <div class="chapter-nav">
+    <a href="ch09.html">← Previous</a>
+    <a href="ch11.html">Next →</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <header class="chapter-header">
+    <div class="chapter-label">Chapter 10</div>
+    <h1 class="chapter-title">Design Patterns in Multi-Agent Workflows</h1>
+    <p class="chapter-subtitle">Gang of Four Meets the LLM Runtime</p>
+    <div class="chapter-meta">
+      <span>Part IV — The New Architecture</span>
+      <span>7 sections</span>
+    </div>
+  </header>
+
+  <div class="prose">
+
+    <p>The Gang of Four catalogued 23 design patterns in 1994. They did not know about LLMs. But the patterns survived because they encode solutions to structural problems — not solutions to Java problems. Multi-agent systems have the same structural problems: object creation, event handling, behavioral variation, pipeline composition, shared state management. The patterns translate directly.</p>
+
+    <hr class="section-divider">
+
+    <h2>10.1 &nbsp; Why Patterns Survive</h2>
+    <p>A design pattern is a solution to a recurring problem in a given context. The context changes — algorithms instead of objects, probabilistic instead of deterministic — but the problems recur. The pattern abstracts over the implementation details and exposes the structural solution. That structure is what survives.</p>
+
+    <hr class="section-divider">
+
+    <h2>10.2 &nbsp; Factory → Dynamic Agent Spawner</h2>
+    <p>The <strong>Factory Method</strong> pattern creates objects without specifying the exact class. Applied to agents: a Factory creates the right agent for the task without the caller needing to know which agent, which model, or which tools that agent will use.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 10.1 — Dynamic Agent Spawner: Factory Pattern</div>
+      <svg width="680" height="220" viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr10" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+      </marker>
+    </defs>
+
+    <!-- Task input -->
+    <rect x="20" y="84" width="110" height="52" rx="8" fill="#374151"/>
+    <text x="75" y="104" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Task Request</text>
+    <text x="75" y="118" font-size="9" fill="#d1d5db" text-anchor="middle" font-family="Segoe UI,sans-serif">type: "research"</text>
+    <text x="75" y="130" font-size="9" fill="#d1d5db" text-anchor="middle" font-family="Segoe UI,sans-serif">topic: "APAC risk"</text>
+    <line x1="130" y1="110" x2="174" y2="110" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10)"/>
+
+    <!-- Factory -->
+    <rect x="176" y="62" width="160" height="96" rx="10" fill="#d97706"/>
+    <text x="256" y="86" font-size="11" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">AgentFactory</text>
+    <text x="256" y="103" font-size="9" fill="#fef3c7" text-anchor="middle" font-family="Segoe UI,sans-serif">1. Reads agent registry</text>
+    <text x="256" y="116" font-size="9" fill="#fef3c7" text-anchor="middle" font-family="Segoe UI,sans-serif">2. Selects template</text>
+    <text x="256" y="129" font-size="9" fill="#fef3c7" text-anchor="middle" font-family="Segoe UI,sans-serif">3. Injects dependencies</text>
+    <text x="256" y="142" font-size="9" fill="#fef3c7" text-anchor="middle" font-family="Segoe UI,sans-serif">4. Returns agent instance</text>
+
+    <!-- Registry -->
+    <rect x="176" y="170" width="160" height="46" rx="8" fill="#1a2744"/>
+    <text x="256" y="190" font-size="9" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Agent Registry</text>
+    <text x="256" y="204" font-size="8" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">research → ResearchAgentSpec ...</text>
+    <line x1="256" y1="158" x2="256" y2="168" stroke="#1a2744" stroke-width="1.5"/>
+
+    <!-- Output instances -->
+    <line x1="336" y1="94" x2="400" y2="52" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10)"/>
+    <line x1="336" y1="110" x2="400" y2="110" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10)"/>
+    <line x1="336" y1="126" x2="400" y2="168" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10)"/>
+
+    <rect x="402" y="28" width="150" height="48" rx="8" fill="#7c3aed"/>
+    <text x="477" y="48" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">ResearchAgent (instance)</text>
+    <text x="477" y="63" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">tools: [search, summarise]</text>
+
+    <rect x="402" y="86" width="150" height="48" rx="8" fill="#2563eb"/>
+    <text x="477" y="106" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">DataAgent (instance)</text>
+    <text x="477" y="121" font-size="9" fill="#bfdbfe" text-anchor="middle" font-family="Segoe UI,sans-serif">tools: [sql, chart]</text>
+
+    <rect x="402" y="144" width="150" height="48" rx="8" fill="#16a34a"/>
+    <text x="477" y="164" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">WriterAgent (instance)</text>
+    <text x="477" y="179" font-size="9" fill="#dcfce7" text-anchor="middle" font-family="Segoe UI,sans-serif">tools: [formatter, export]</text>
+
+    <!-- Benefit note -->
+    <rect x="562" y="62" width="110" height="96" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1"/>
+    <text x="617" y="82" font-size="9" font-weight="700" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">Benefits:</text>
+    <text x="617" y="98" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">✓ No new code</text>
+    <text x="617" y="112" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">   for new type</text>
+    <text x="617" y="126" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">✓ Type-safe DI</text>
+    <text x="617" y="140" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">✓ Registry-driven</text>
+    <text x="617" y="154" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">   configuration</text>
+      </svg>
+      <p class="diagram-caption">The Factory pattern decouples agent creation from agent use. New agent types are added to the registry — no calling code changes. The factory guarantees every instance is correctly wired before execution begins.</p>
+    </div>
+
+    <div class="code-label">Agent Factory Pattern</div>
+    <pre><code>AGENT_CONFIGS = {
+    "research":  {"model": "gemini-flash",  "tools": [search_web, browse_url]},
+    "coding":    {"model": "claude-sonnet", "tools": [run_code, read_file]},
+    "writing":   {"model": "gemini-pro",    "tools": []},
+    "analysis":  {"model": "o1-preview",    "tools": [calculate, query_database]},
+}
+
+def create_agent(task_type: str) -> Agent:
+    config = AGENT_CONFIGS.get(task_type, AGENT_CONFIGS["writing"])
+    return Agent(
+        system_prompt = SYSTEM_PROMPTS[task_type],
+        model         = config["model"],
+        tools         = config["tools"]
+    )</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>10.3 &nbsp; Observer → Event-Driven Agent Triggers</h2>
+    <p>The <strong>Observer</strong> pattern defines a subscription mechanism: objects subscribe to events and are notified when those events occur. Applied to agents: agents subscribe to business events and are triggered when conditions are met — without one agent calling another directly. This is the agentic equivalent of an event-driven microservices architecture.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 10.2 — Event-Driven Agent Architecture</div>
+      <svg width="680" height="200" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr10b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+      </marker>
+    </defs>
+
+    <!-- Event sources -->
+    <rect x="20" y="14" width="110" height="32" rx="6" fill="#374151"/>
+    <text x="75" y="34" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Data Source A</text>
+    <rect x="20" y="54" width="110" height="32" rx="6" fill="#374151"/>
+    <text x="75" y="74" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">API Webhook</text>
+    <rect x="20" y="94" width="110" height="32" rx="6" fill="#374151"/>
+    <text x="75" y="114" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Cron Schedule</text>
+    <rect x="20" y="134" width="110" height="32" rx="6" fill="#374151"/>
+    <text x="75" y="154" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">User Action</text>
+
+    <!-- Arrows to bus -->
+    <line x1="130" y1="30" x2="198" y2="84" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10b)"/>
+    <line x1="130" y1="70" x2="198" y2="90" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10b)"/>
+    <line x1="130" y1="110" x2="198" y2="104" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10b)"/>
+    <line x1="130" y1="150" x2="198" y2="118" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10b)"/>
+
+    <!-- Event bus -->
+    <rect x="200" y="60" width="140" height="80" rx="10" fill="#1a2744"/>
+    <text x="270" y="84" font-size="11" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Event Bus</text>
+    <text x="270" y="100" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Queue, filter, route</text>
+    <text x="270" y="114" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">events to subscribers</text>
+    <text x="270" y="128" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">(Kafka / Redis / SQS)</text>
+
+    <!-- Arrows to agents -->
+    <line x1="340" y1="84" x2="410" y2="44" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10b)"/>
+    <line x1="340" y1="100" x2="410" y2="100" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10b)"/>
+    <line x1="340" y1="116" x2="410" y2="156" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10b)"/>
+
+    <!-- Subscriber agents -->
+    <rect x="412" y="20" width="130" height="48" rx="8" fill="#7c3aed"/>
+    <text x="477" y="40" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">AlertAgent</text>
+    <text x="477" y="55" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Subscribes: threshold_breach</text>
+
+    <rect x="412" y="76" width="130" height="48" rx="8" fill="#2563eb"/>
+    <text x="477" y="96" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">AnalysisAgent</text>
+    <text x="477" y="111" font-size="9" fill="#bfdbfe" text-anchor="middle" font-family="Segoe UI,sans-serif">Subscribes: new_data_available</text>
+
+    <rect x="412" y="132" width="130" height="48" rx="8" fill="#d97706"/>
+    <text x="477" y="152" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">ReportAgent</text>
+    <text x="477" y="167" font-size="9" fill="#fef3c7" text-anchor="middle" font-family="Segoe UI,sans-serif">Subscribes: schedule_tick</text>
+
+    <!-- Outputs -->
+    <line x1="542" y1="44" x2="620" y2="44" stroke="#e5e7eb" stroke-width="1" marker-end="url(#arr10b)"/>
+    <rect x="622" y="28" width="50" height="32" rx="4" fill="#14532d"/>
+    <text x="647" y="44" font-size="8" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Action</text>
+
+    <rect x="550" y="166" width="122" height="24" rx="6" fill="#fef3c7" stroke="#d97706"/>
+    <text x="611" y="182" font-size="8" fill="#78350f" text-anchor="middle" font-family="Segoe UI,sans-serif">Agents are fully decoupled — no polling</text>
+      </svg>
+      <p class="diagram-caption">Event-driven agent architecture replaces polling and scheduled queries with reactive subscriptions. Agents only execute when their trigger event arrives — eliminating wasted inference calls and idle computation.</p>
+    </div>
+
+    <div class="code-label">Event-Driven Agent Triggers</div>
+    <pre><code>@on_event("document.uploaded")
+async def summarize_document(event: Event):
+    agent = create_agent("summarization")
+    summary = await agent.run(f"Summarize: {event.payload.document_url}")
+    await publish("document.summarized", summary=summary)
+
+@on_event("survey.submitted")
+async def analyze_sentiment(event: Event):
+    agent = create_agent("analysis")
+    sentiment = await agent.run(f"Rate sentiment 1–10: {event.payload.responses}")
+    await publish("survey.analyzed", sentiment=sentiment)</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>10.4 &nbsp; Strategy → Hot-Swap Models</h2>
+    <p>The <strong>Strategy</strong> pattern defines a family of algorithms, encapsulates each one, and makes them interchangeable. Applied to agents: the "algorithm" is the model, and models are selected at runtime based on task characteristics — accuracy requirements, latency budget, cost constraints, and context length.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Task Type</th><th>Strategy (Model)</th><th>Rationale</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Simple classification</td><td>gemini-flash (fast, cheap)</td><td>Does not need reasoning depth; latency matters</td></tr>
+          <tr><td>Multi-step reasoning</td><td>o1-preview (reasoning model)</td><td>Complex chain-of-thought; accuracy critical</td></tr>
+          <tr><td>Code generation</td><td>claude-3-5-sonnet</td><td>Strong code performance; supports long context</td></tr>
+          <tr><td>Long-document analysis</td><td>gemini-1.5-pro (1M context)</td><td>Document too long for other models</td></tr>
+          <tr><td>Real-time user-facing</td><td>gpt-4o-mini</td><td>Fast first-token; streaming response needed</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-label">Strategy Pattern — Model Selection</div>
+    <pre><code>def select_model(task: Task) -> str:
+    if task.requires_reasoning and task.accuracy_threshold > 0.9:
+        return "o1-preview"
+    elif task.context_length > 100_000:
+        return "gemini-1.5-pro"
+    elif task.task_type == "code":
+        return "claude-3-5-sonnet-20241022"
+    elif task.latency_budget < 2.0:  # seconds
+        return "gpt-4o-mini"
+    else:
+        return "gemini-pro"  # default balanced choice</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>10.5 &nbsp; Chain of Responsibility → Agent Pipeline</h2>
+    <p>The <strong>Chain of Responsibility</strong> pattern passes a request along a chain of handlers, each deciding to process or pass forward. Applied to agents: a multi-agent pipeline where each stage performs a specific transformation on the data — receiving, processing, and handing off to the next stage with a clear contract.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 10.3 — Agent Pipeline: Chain of Responsibility</div>
+      <svg width="680" height="160" viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr10c" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+      </marker>
+    </defs>
+
+    <!-- Input -->
+    <rect x="10" y="54" width="70" height="52" rx="6" fill="#374151"/>
+    <text x="45" y="75" font-size="9" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Raw</text>
+    <text x="45" y="88" font-size="9" fill="#d1d5db" text-anchor="middle" font-family="Segoe UI,sans-serif">Document</text>
+    <text x="45" y="101" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">12k tokens</text>
+    <line x1="80" y1="80" x2="104" y2="80" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10c)"/>
+
+    <!-- Stage 1 -->
+    <rect x="106" y="44" width="100" height="72" rx="8" fill="#2563eb"/>
+    <text x="156" y="67" font-size="9" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">ExtractAgent</text>
+    <text x="156" y="82" font-size="8" fill="#bfdbfe" text-anchor="middle" font-family="Segoe UI,sans-serif">Pulls key facts</text>
+    <text x="156" y="96" font-size="8" fill="#bfdbfe" text-anchor="middle" font-family="Segoe UI,sans-serif">→ structured JSON</text>
+    <text x="156" y="110" font-size="8" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">output: 400 tok</text>
+    <line x1="206" y1="80" x2="234" y2="80" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10c)"/>
+
+    <!-- Stage 2 -->
+    <rect x="236" y="44" width="100" height="72" rx="8" fill="#7c3aed"/>
+    <text x="286" y="67" font-size="9" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">EnrichAgent</text>
+    <text x="286" y="82" font-size="8" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Adds external</text>
+    <text x="286" y="96" font-size="8" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">reference data</text>
+    <text x="286" y="110" font-size="8" fill="#c4b5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">output: 800 tok</text>
+    <line x1="336" y1="80" x2="364" y2="80" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10c)"/>
+
+    <!-- Stage 3 -->
+    <rect x="366" y="44" width="100" height="72" rx="8" fill="#d97706"/>
+    <text x="416" y="67" font-size="9" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">ScoreAgent</text>
+    <text x="416" y="82" font-size="8" fill="#fef3c7" text-anchor="middle" font-family="Segoe UI,sans-serif">Risk scoring</text>
+    <text x="416" y="96" font-size="8" fill="#fef3c7" text-anchor="middle" font-family="Segoe UI,sans-serif">→ numeric output</text>
+    <text x="416" y="110" font-size="8" fill="#fde68a" text-anchor="middle" font-family="Segoe UI,sans-serif">output: 100 tok</text>
+    <line x1="466" y1="80" x2="494" y2="80" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10c)"/>
+
+    <!-- Stage 4 -->
+    <rect x="496" y="44" width="100" height="72" rx="8" fill="#16a34a"/>
+    <text x="546" y="67" font-size="9" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">NarrateAgent</text>
+    <text x="546" y="82" font-size="8" fill="#dcfce7" text-anchor="middle" font-family="Segoe UI,sans-serif">Human-readable</text>
+    <text x="546" y="96" font-size="8" fill="#dcfce7" text-anchor="middle" font-family="Segoe UI,sans-serif">summary</text>
+    <text x="546" y="110" font-size="8" fill="#86efac" text-anchor="middle" font-family="Segoe UI,sans-serif">output: 600 tok</text>
+    <line x1="596" y1="80" x2="622" y2="80" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10c)"/>
+
+    <!-- Output -->
+    <rect x="624" y="54" width="50" height="52" rx="6" fill="#1a2744"/>
+    <text x="649" y="74" font-size="9" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Final</text>
+    <text x="649" y="88" font-size="8" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Report</text>
+    <text x="649" y="100" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">600 tok</text>
+
+    <!-- Data reduction arc -->
+    <path d="M45,108 Q340,148 649,108" fill="none" stroke="#16a34a" stroke-width="1" stroke-dasharray="4,2"/>
+    <text x="340" y="155" font-size="8" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">12,000 tokens → 600 tokens: 95% reduction through progressive specialisation</text>
+      </svg>
+      <p class="diagram-caption">Chain of Responsibility applies to agents as a data transformation pipeline. Each stage receives a progressively refined intermediate artifact — enabling progressive specialisation and drastic token reduction.</p>
+    </div>
+
+    <div class="code-label">Pipeline Stage Contracts</div>
+    <pre><code">PIPELINE_CONTRACTS = {
+    "ingestion":  {"input": "raw_document",    "output": "structured_text"},
+    "research":   {"input": "structured_text",  "output": "annotated_text"},
+    "analysis":   {"input": "annotated_text",   "output": "analysis_report"},
+    "writing":    {"input": "analysis_report",  "output": "draft_document"},
+    "quality":    {"input": "draft_document",   "output": "final_document"},
+}</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>10.6 &nbsp; Singleton → Shared Workflow Memory</h2>
+    <p>The <strong>Singleton</strong> pattern ensures a class has only one instance and provides a global access point to it. Applied to multi-agent systems: shared workflow memory that all agents in a pipeline can read from and write to — a single source of truth for the state of the current workflow, preventing the context fragmentation problem (Chapter 4) in multi-hop workflows.</p>
+
+    <div class="code-label">Workflow Memory Singleton</div>
+    <pre><code">class WorkflowMemory:
+    _instance: Optional["WorkflowMemory"] = None
+    
+    def __new__(cls) -> "WorkflowMemory":
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.state = {}
+        return cls._instance
+    
+    def set(self, key: str, value: Any) -> None:
+        self.state[key] = value
+    
+    def get(self, key: str, default: Any = None) -> Any:
+        return self.state.get(key, default)
+
+# Any agent in the pipeline accesses the same memory object:
+memory = WorkflowMemory()
+memory.set("user_profile", profile)  # written by Agent 1
+profile = memory.get("user_profile") # read by Agent 3</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>10.7 &nbsp; Anti-Patterns in Multi-Agent Systems</h2>
+    <p>Design patterns describe what works. Anti-patterns describe what looks like it works but reliably fails.</p>
+
+    <h3>God Prompt Agent</h3>
+    <p>A single agent trying to do everything. Violates SRP (Chapter 9). The fix: decompose into specialized agents connected through an Orchestrator or pipeline.</p>
+
+    <h3>Chatty Agent</h3>
+    <p>Agents that communicate too frequently in tiny steps — sending a message, waiting for a reply, sending a follow-up — instead of batching work. Each round trip incurs latency and token cost. The fix: batch the context payload once, get a comprehensive response, pass it to the next stage. Use parallel sub-agents (Chapter 6) for independent tasks.</p>
+
+    <h3>Blind Passer</h3>
+    <p>An agent in a pipeline that receives context, passes it to the next agent unchanged, and adds no value — essentially a relay node. Often a symptom of a pipeline that was designed wrong: this stage does not need to be an LLM call at all.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 10.4 — The Blind Passer Anti-Pattern</div>
+      <svg width="680" height="180" viewBox="0 0 680 180" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr10d" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+      </marker>
+    </defs>
+
+    <!-- Pipeline with hollow relay -->
+    <rect x="20" y="60" width="110" height="60" rx="8" fill="#16a34a"/>
+    <text x="75" y="83" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Agent A</text>
+    <text x="75" y="97" font-size="9" fill="#dcfce7" text-anchor="middle" font-family="Segoe UI,sans-serif">Produced a</text>
+    <text x="75" y="109" font-size="9" fill="#dcfce7" text-anchor="middle" font-family="Segoe UI,sans-serif">good result ✓</text>
+    <line x1="130" y1="90" x2="196" y2="90" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10d)"/>
+
+    <rect x="198" y="60" width="110" height="60" rx="8" fill="#dc2626"/>
+    <text x="253" y="80" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Agent B</text>
+    <text x="253" y="95" font-size="9" fill="#fecaca" text-anchor="middle" font-family="Segoe UI,sans-serif">⚠ BLIND PASSER</text>
+    <text x="253" y="109" font-size="9" fill="#fecaca" text-anchor="middle" font-family="Segoe UI,sans-serif">Just forwards A's output</text>
+    <text x="253" y="122" font-size="8" fill="#fca5a5" text-anchor="middle" font-family="Segoe UI,sans-serif">without processing</text>
+    <line x1="308" y1="90" x2="374" y2="90" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10d)"/>
+
+    <rect x="376" y="60" width="110" height="60" rx="8" fill="#7c3aed"/>
+    <text x="431" y="83" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Agent C</text>
+    <text x="431" y="97" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Receives A's output</text>
+    <text x="431" y="109" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">as if from B</text>
+    <line x1="486" y1="90" x2="552" y2="90" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr10d)"/>
+
+    <!-- Problem annotation -->
+    <rect x="554" y="60" width="118" height="60" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+    <text x="613" y="80" font-size="9" font-weight="700" fill="#92400e" text-anchor="middle" font-family="Segoe UI,sans-serif">Problems:</text>
+    <text x="613" y="95" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">B wastes token</text>
+    <text x="613" y="108" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">budget for zero</text>
+    <text x="613" y="121" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">transformation</text>
+
+    <!-- Solution -->
+    <rect x="20" y="136" width="640" height="36" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+    <text x="340" y="152" font-size="9" font-weight="700" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">Fix: Either remove Agent B from the pipeline, or give it a real transformation responsibility.</text>
+    <text x="340" y="166" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Each agent in a chain must add specific value. Relay agents that only forward data are architectural debt.</text>
+      </svg>
+      <p class="diagram-caption">The Blind Passer anti-pattern occurs when an agent in a chain neither transforms nor validates its input — it simply forwards. Every agent in a pipeline must have a measurable responsibility; passive relays should be removed.</p>
+    </div>
+
+    <div class="core-principle">
+      <div class="core-principle-label">Core Principle — Chapter 10</div>
+      <p>Design patterns encode structural solutions to recurring problems. <strong>The structure of the problem did not change — only the medium.</strong> Factory, Observer, Strategy, Chain of Responsibility, and Singleton all translate directly from class hierarchies to agent architectures because the underlying complexities — creation, events, variation, sequencing, shared state — are the same problems in a new domain.</p>
+    </div>
+
+  </div><!-- /.prose -->
+
+  <nav class="bottom-nav">
+    <a href="ch09.html">
+      <span class="nav-direction">← Previous</span>
+      <span class="nav-title">Chapter 9 — SOLID Principles</span>
+    </a>
+    <a href="ch11.html" class="next">
+      <span class="nav-direction">Next →</span>
+      <span class="nav-title">Chapter 11 — TDD for Agents</span>
+    </a>
+  </nav>
+
+</div><!-- /.page-wrap -->
+
+<footer class="site-copyright">&copy; 2026 Nguyen Ngo &middot; The Agentic Programming Language</footer>
+</body>
+</html>

@@ -1,0 +1,317 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 9 — SOLID Principles for Agent Systems | The Agentic Programming Language</title>
+<link rel="stylesheet" href="reading.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="book-title">The Agentic Programming Language</a>
+  <div class="chapter-nav">
+    <a href="ch08.html">← Previous</a>
+    <a href="ch10.html">Next →</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <header class="chapter-header">
+    <div class="chapter-label">Chapter 9</div>
+    <h1 class="chapter-title">SOLID Principles for Agent Systems</h1>
+    <p class="chapter-subtitle">Why Fifty-Year-Old Rules Still Apply</p>
+    <div class="chapter-meta">
+      <span>Part IV — The New Architecture</span>
+      <span>8 sections</span>
+
+    </div>
+  </header>
+
+  <div class="prose">
+
+    <p>SOLID is a set of five principles for writing maintainable object-oriented software: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion. It was formalized in the 1990s for Java and C#. It completely applies to agentic systems — not by analogy, but structurally.</p>
+    <p>The reason is simple: SOLID was never really about classes. It was about managing complexity and change in systems that have multiple components with different concerns. Agentic systems have all of that and more.</p>
+
+    <hr class="section-divider">
+
+    <h2>9.1 &nbsp; Why SOLID Matters for Agents</h2>
+    <p>The failure trajectory of an agentic system without SOLID is predictable. Week 1: you build a working agent. Week 3: you need to add a new capability, so you extend the system prompt. Week 6: the prompt is 8,000 tokens. Behavior regresses when you make changes. Evals start failing mysteriously. You cannot tell which part of the prompt caused a bug. Week 10: you have a God Prompt, context rot, and a test suite that is effectively useless. SOLID exists to break that trajectory before it starts.</p>
+
+    <hr class="section-divider">
+
+    <h2>9.2 &nbsp; S — Single Responsibility Principle</h2>
+    <p><em>"A class should have only one reason to change."</em></p>
+    <p>Applied to agents: <strong>an agent should have only one clearly defined job.</strong> An agent that handles customer service enquiries, generates marketing copy, performs data analysis, and translates documents is not a customer service agent — it is a God Prompt with a name. Each of those is a separate reason to change the prompt, and changes to one concern will degrade others through context dilution.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 9.1 — Single Responsibility Principle: Before and After Decomposition</div>
+      <svg width="680" height="230" viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr9" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+      </marker>
+    </defs>
+
+    <!-- BEFORE: one fat agent -->
+    <text x="150" y="18" font-size="12" font-weight="700" fill="#dc2626" text-anchor="middle" font-family="Segoe UI,sans-serif">Before: SRP Violation</text>
+    <rect x="30" y="26" width="240" height="180" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+    <text x="150" y="50" font-size="11" font-weight="700" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">MonolithicAnalystAgent</text>
+    <!-- Responsibilities inside -->
+    <rect x="46" y="60" width="208" height="22" rx="4" fill="#fecaca"/>
+    <text x="150" y="75" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">📊 Fetch and clean data</text>
+    <rect x="46" y="86" width="208" height="22" rx="4" fill="#fecaca"/>
+    <text x="150" y="101" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">📈 Perform statistical analysis</text>
+    <rect x="46" y="112" width="208" height="22" rx="4" fill="#fecaca"/>
+    <text x="150" y="127" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">✍️ Write narrative commentary</text>
+    <rect x="46" y="138" width="208" height="22" rx="4" fill="#fecaca"/>
+    <text x="150" y="153" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">📑 Format and generate PDF</text>
+    <rect x="46" y="164" width="208" height="22" rx="4" fill="#fecaca"/>
+    <text x="150" y="179" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">📧 Send email with report</text>
+    <text x="150" y="200" font-size="9" fill="#dc2626" text-anchor="middle" font-family="Segoe UI,sans-serif">⚠ 5 responsibilities = 5 failure modes</text>
+
+    <!-- Arrow -->
+    <line x1="280" y1="116" x2="374" y2="116" stroke="#6b7280" stroke-width="2" marker-end="url(#arr9)"/>
+    <text x="327" y="108" font-size="9" fill="#7c3aed" text-anchor="middle" font-family="Segoe UI,sans-serif">decompose</text>
+    <text x="327" y="124" font-size="9" fill="#7c3aed" text-anchor="middle" font-family="Segoe UI,sans-serif">→ single role</text>
+
+    <!-- AFTER: five focused agents -->
+    <text x="530" y="18" font-size="12" font-weight="700" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">After: SRP Applied</text>
+
+    <rect x="378" y="26" width="130" height="38" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="443" y="44" font-size="9" font-weight="700" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">DataAgent</text>
+    <text x="443" y="57" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Fetch + clean only</text>
+
+    <rect x="378" y="72" width="130" height="38" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="443" y="90" font-size="9" font-weight="700" fill="#1e3a5f" text-anchor="middle" font-family="Segoe UI,sans-serif">AnalysisAgent</text>
+    <text x="443" y="103" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Statistics only</text>
+
+    <rect x="378" y="118" width="130" height="38" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+    <text x="443" y="136" font-size="9" font-weight="700" fill="#78350f" text-anchor="middle" font-family="Segoe UI,sans-serif">WriterAgent</text>
+    <text x="443" y="149" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Commentary only</text>
+
+    <rect x="378" y="164" width="130" height="38" rx="6" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="443" y="182" font-size="9" font-weight="700" fill="#4c1d95" text-anchor="middle" font-family="Segoe UI,sans-serif">FormatterAgent</text>
+    <text x="443" y="195" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">PDF generation only</text>
+
+    <rect x="520" y="26" width="140" height="38" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text x="590" y="44" font-size="9" font-weight="700" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">DeliveryAgent</text>
+    <text x="590" y="57" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Send email only</text>
+
+    <!-- Orchestrator above -->
+    <rect x="520" y="72" width="140" height="52" rx="6" fill="#1a2744"/>
+    <text x="590" y="92" font-size="9" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Orchestrator</text>
+    <text x="590" y="106" font-size="8" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Sequences agents</text>
+    <text x="590" y="118" font-size="8" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Passes outputs</text>
+
+    <text x="530" y="150" font-size="9" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">✓ Each agent testable alone</text>
+    <text x="530" y="165" font-size="9" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">✓ Single failure = single cause</text>
+    <text x="530" y="180" font-size="9" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">✓ Replace one without touching others</text>
+      </svg>
+      <p class="diagram-caption">A monolithic agent fails for five different reasons and none of them produce a clear error signal. Decomposition by responsibility makes each failure localised, diagnosable, and fixable in isolation.</p>
+    </div>
+
+    <div class="code-label">SRP — Decomposing a Monolithic Pipeline</div>
+    <pre><code># BEFORE — Single agent with multiple responsibilities
+god_prompt = """
+You are a customer service agent. Handle orders, refunds,
+shipping inquiries, complaints, and general FAQs. For orders,
+check status. For refunds, verify eligibility based on 30-day
+policy. For shipping, check carrier API. For complaints...
+[continues for 4,000 more tokens]
+"""
+
+# AFTER — Pipeline: each agent has one job
+order_classifier    → classifies the intent
+refund_specialist   → handles refund logic only
+shipping_specialist → handles shipping queries only
+escalation_handler  → handles complaints / complex issues
+faq_responder       → handles general questions</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>9.3 &nbsp; O — Open/Closed Principle</h2>
+    <p><em>"Open for extension, closed for modification."</em></p>
+    <p>Applied to agents: the <strong>system prompt is closed for modification</strong> once validated; new capabilities should be added through tool injection (Chapter 8), not by editing the core prompt. Every time you edit a working system prompt, you risk introducing regressions in all the behaviors that were already working. The Open/Closed approach keeps the prompt stable and extends capability through the tool interface.</p>
+
+    <div class="code-label">OCP — Extending via Tools, Not Prompt Modification</div>
+    <pre><code># CLOSED: This system prompt is tested and validated. Do not modify.
+SYSTEM_PROMPT = """
+You are a customer service agent. When a user makes a request,
+use the tools provided to find an answer. Tools define what you 
+can do — do not speculate about capabilities you don't have tools for.
+"""
+
+# OPEN for extension: add new tools without touching the prompt
+v1_tools = [get_order_status]
+v2_tools = [get_order_status, process_refund]      # New capability added
+v3_tools = [get_order_status, process_refund,       # Another extension
+            get_shipping_status]</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>9.4 &nbsp; L — Liskov Substitution Principle</h2>
+    <p><em>"Subtypes must be substitutable for their base types."</em></p>
+    <p>Applied to agents: if you design your prompts to be model-agnostic — avoiding formatting that only works on one model, avoiding reliance on specific model behaviors — then any model that supports your tool schema is a valid substitution. This is what enables model hot-swapping (Chapter 8). The key design rule: <strong>format your prompts for the interface, not for the implementation.</strong></p>
+
+    <div class="code-label">LSP — Model-Agnostic Prompt Design</div>
+    <pre><code># ANTI-PATTERN: Relies on GPT-4's specific behavior for *** delimiters
+prompt = """
+Use *** to start and end each section of your response.
+***Summary***
+[your summary here]
+***Recommendations***
+[your recommendations here]
+"""
+
+# LSP-COMPLIANT: Uses explicit XML tags that work across models
+prompt = """
+Structure your response as:
+&lt;summary&gt;A 2-3 sentence overview of the situation.&lt;/summary&gt;
+&lt;recommendations&gt;A numbered list of 3-5 actionable recommendations.&lt;/recommendations&gt;
+"""</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>9.5 &nbsp; I — Interface Segregation Principle</h2>
+    <p><em>"Clients should not be forced to depend on interfaces they do not use."</em></p>
+    <p>Applied to agents: do not inject tools an agent does not need. A tool is a claim on context Window attention. Injecting 20 tools into an agent that will only ever call 2 of them pollutes the context, increases hallucination risk (the model may invoke an irrelevant tool), and increases cost.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 9.2 — Interface Segregation Principle: Tool Bloat vs. Tool Segregation</div>
+      <svg width="680" height="200" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Left: Bloated tool interface -->
+    <text x="170" y="18" font-size="12" font-weight="700" fill="#dc2626" text-anchor="middle" font-family="Segoe UI,sans-serif">Tool Bloat (ISP Violation)</text>
+    <rect x="20" y="26" width="300" height="140" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+    <text x="170" y="46" font-size="10" font-weight="700" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">DatabaseTool (monolithic)</text>
+    <!-- Tool methods list -->
+    <text x="34" y="64" font-size="9" fill="#374151" font-family="Cascadia Code,Consolas,monospace">read_table()</text>
+    <text x="34" y="78" font-size="9" fill="#374151" font-family="Cascadia Code,Consolas,monospace">write_row()</text>
+    <text x="34" y="92" font-size="9" fill="#374151" font-family="Cascadia Code,Consolas,monospace">delete_row()  ← read-only agents get this too</text>
+    <text x="34" y="106" font-size="9" fill="#374151" font-family="Cascadia Code,Consolas,monospace">drop_table()  ← read-only agents get this too</text>
+    <text x="34" y="120" font-size="9" fill="#374151" font-family="Cascadia Code,Consolas,monospace">run_migration()</text>
+    <text x="34" y="134" font-size="9" fill="#374151" font-family="Cascadia Code,Consolas,monospace">bulk_import()</text>
+    <rect x="34" y="146" width="272" height="14" rx="3" fill="#fecaca"/>
+    <text x="170" y="157" font-size="8" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">All agents carry ALL methods → security risk + context cost</text>
+
+    <!-- Divider -->
+    <line x1="340" y1="14" x2="340" y2="190" stroke="#e5e7eb" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+    <!-- Right: Segregated -->
+    <text x="510" y="18" font-size="12" font-weight="700" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">Tool Segregation (ISP Applied)</text>
+
+    <rect x="360" y="26" width="140" height="70" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="430" y="44" font-size="9" font-weight="700" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">ReadOnlyDB</text>
+    <text x="370" y="58" font-size="8" fill="#374151" font-family="Cascadia Code,Consolas,monospace">read_table()</text>
+    <text x="370" y="72" font-size="8" fill="#374151" font-family="Cascadia Code,Consolas,monospace">query_filter()</text>
+    <text x="370" y="84" font-size="8" fill="#374151" font-family="Cascadia Code,Consolas,monospace">get_schema()</text>
+
+    <rect x="520" y="26" width="140" height="70" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+    <text x="590" y="44" font-size="9" font-weight="700" fill="#78350f" text-anchor="middle" font-family="Segoe UI,sans-serif">WriteDB</text>
+    <text x="530" y="58" font-size="8" fill="#374151" font-family="Cascadia Code,Consolas,monospace">write_row()</text>
+    <text x="530" y="72" font-size="8" fill="#374151" font-family="Cascadia Code,Consolas,monospace">upsert()</text>
+    <text x="530" y="84" font-size="8" fill="#374151" font-family="Cascadia Code,Consolas,monospace">bulk_import()</text>
+
+    <rect x="360" y="104" width="140" height="56" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text x="430" y="122" font-size="9" font-weight="700" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">AdminDB</text>
+    <text x="370" y="136" font-size="8" fill="#374151" font-family="Cascadia Code,Consolas,monospace">delete_row()</text>
+    <text x="370" y="148" font-size="8" fill="#374151" font-family="Cascadia Code,Consolas,monospace">drop_table()</text>
+    <text x="370" y="160" font-size="8" fill="#374151" font-family="Cascadia Code,Consolas,monospace">run_migration()</text>
+
+    <text x="590" y="120" font-size="9" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">✓ Inject only the</text>
+    <text x="590" y="134" font-size="9" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">interface role needs</text>
+    <text x="590" y="152" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">ReadOnly agent gets</text>
+    <text x="590" y="165" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">only ReadOnlyDB</text>
+      </svg>
+      <p class="diagram-caption">Applied to agents: no agent should be given a tool it doesn't require. Segregated tool interfaces save context tokens and enforce security boundaries that a monolithic tool cannot provide.</p>
+    </div>
+
+    <div class="code-label">ISP — Intent-Scoped Tool Injection</div>
+    <pre><code>INTENT_TO_TOOLS = {
+    "order_status":  [get_order_status, get_estimated_delivery],
+    "process_refund":[get_order_status, check_refund_eligibility,
+                      apply_refund, send_confirmation_email],
+    "shipping_query":[get_shipping_status, get_carrier_info],
+    "general_faq":   [search_knowledge_base],
+}
+
+def get_tools_for_intent(intent: str) -> list:
+    return INTENT_TO_TOOLS.get(intent, [search_knowledge_base])</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>9.6 &nbsp; D — Dependency Inversion Principle</h2>
+    <p><em>"Depend on abstractions, not concretions."</em></p>
+    <p>Applied to agents: the <strong>agent prompt depends on the tool schema — the abstraction — not on the underlying implementation</strong>. The system prompt describes what the tool does, in general terms. Whether that description maps to a Google Search API, a Bing Search API, or a custom internal search engine is invisible to the agent. The prompt is not coupled to the implementation.</p>
+
+    <div class="code-label">DIP — Decoupled Tool Schema</div>
+    <pre><code># The tool schema is the abstraction the agent depends on
+SEARCH_TOOL_SCHEMA = {
+    "name": "search_web",
+    "description": "Search the web for current information on a topic.",
+    "parameters": {
+        "query": {"type": "string", "description": "The search query"}
+    }
+}
+
+# IMPLEMENTATION A — Google (production)
+def google_search_impl(query: str) -> str:
+    return google_api.search(query)
+
+# IMPLEMENTATION B — Bing (fallback)
+def bing_search_impl(query: str) -> str:
+    return bing_api.search(query)
+
+# IMPLEMENTATION C — Mock (testing)
+def mock_search_impl(query: str) -> str:
+    return GOLDEN_DATASET_RESPONSES.get(query, "")</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>9.7 &nbsp; SOLID Violations in the Wild</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Principle</th><th>Common Agentic Violation</th><th>Consequence</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SRP</td><td>One agent handles 12 different service categories</td><td>Context rot; evals break unpredictably on changes</td></tr>
+          <tr><td>OCP</td><td>Adding capability by editing the validated system prompt</td><td>Regressions in previously working behavior</td></tr>
+          <tr><td>LSP</td><td>Prompts use GPT-4-specific markdown formatting</td><td>Model migration requires full rewrite and re-eval</td></tr>
+          <tr><td>ISP</td><td>Injecting all 20 tools into every agent call</td><td>Hallucinated tool calls; increased cost; reduced accuracy</td></tr>
+          <tr><td>DIP</td><td>API key and endpoint hardcoded in system prompt</td><td>Security exposure; unable to change implementation without re-testing prompt</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>9.8 &nbsp; Chapter Summary</h2>
+    <p>SOLID is not a checklist for Java developers. It is a framework for reasoning about change and complexity in systems composed of multiple components with different concerns. Agentic systems — with their prompts, models, tools, evaluations, and orchestrators — exhibit all of these properties. The patterns that worked in object-oriented systems work here too: for the same reasons, in the same ways, with the same payoffs.</p>
+
+    <div class="core-principle">
+      <div class="core-principle-label">Core Principle — Chapter 9</div>
+      <p>SOLID principles are not rules about Java. <strong>They are rules about managing complexity and change.</strong> Agentic systems are not exempt from either — they are uniquely vulnerable to both.</p>
+    </div>
+
+  </div><!-- /.prose -->
+
+  <nav class="bottom-nav">
+    <a href="ch08.html">
+      <span class="nav-direction">← Previous</span>
+      <span class="nav-title">Chapter 8 — Dependency Injection</span>
+    </a>
+    <a href="ch10.html" class="next">
+      <span class="nav-direction">Next →</span>
+      <span class="nav-title">Chapter 10 — Design Patterns</span>
+    </a>
+  </nav>
+
+</div><!-- /.page-wrap -->
+
+<footer class="site-copyright">&copy; 2026 Nguyen Ngo &middot; The Agentic Programming Language</footer>
+</body>
+</html>

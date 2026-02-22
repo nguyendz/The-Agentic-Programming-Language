@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Agentic Programming Language — Table of Contents</title>
+<link rel="stylesheet" href="reading.css">
+<style>
+/* Index-specific styles */
+.book-hero {
+  padding: 3.5rem 0 2.5rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 2.5rem;
+}
+.book-hero-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 0.75rem;
+}
+.book-hero-title {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.2;
+  margin: 0 0 0.75rem;
+}
+.book-hero-subtitle {
+  font-size: 1.05rem;
+  color: var(--ink-light);
+  margin: 0 0 1.5rem;
+  max-width: 560px;
+}
+.book-hero-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  color: var(--ink-light);
+}
+.book-hero-meta a {
+  color: var(--blue);
+  text-decoration: none;
+}
+.book-hero-meta a:hover { text-decoration: underline; }
+
+.part-section {
+  margin-bottom: 2.5rem;
+}
+.part-header {
+  padding: 0.5rem 0 0.6rem;
+  border-bottom: 2px solid var(--navy);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+.part-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blue);
+  white-space: nowrap;
+}
+.part-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.chapter-row {
+  display: grid;
+  grid-template-columns: 2.8rem 1fr auto;
+  gap: 0 1rem;
+  align-items: start;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+}
+.chapter-row:hover { background: #f0f4ff; border-radius: 6px; }
+.chapter-row:last-child { border-bottom: none; }
+
+.ch-num {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--blue);
+  padding-top: 0.2rem;
+  text-align: right;
+}
+.ch-body {}
+.ch-title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.3;
+  margin-bottom: 0.18rem;
+}
+.ch-subtitle {
+  font-size: 0.82rem;
+  color: var(--ink-light);
+  line-height: 1.4;
+  margin-bottom: 0.35rem;
+}
+.ch-links {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.ch-links a {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--blue);
+  text-decoration: none;
+  padding: 0.18rem 0.55rem;
+  border: 1px solid var(--blue);
+  border-radius: 3px;
+  transition: background 0.15s, color 0.15s;
+}
+.ch-links a:hover { background: var(--blue); color: #fff; }
+.ch-meta {
+  font-size: 0.73rem;
+  color: var(--ink-light);
+  white-space: nowrap;
+  padding-top: 0.25rem;
+}
+
+.index-footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--ink-light);
+}
+.index-footer a {
+  color: var(--blue);
+  text-decoration: none;
+}
+.index-footer a:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .chapter-row { grid-template-columns: 2.2rem 1fr; }
+  .ch-meta { grid-column: 2; }
+  .part-header { flex-direction: column; gap: 0.2rem; }
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="book-title">The Agentic Programming Language</a>
+  <div class="chapter-nav">
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <div class="book-hero">
+    <div class="book-hero-label">Table of Contents</div>
+    <h1 class="book-hero-title">The Agentic Programming Language</h1>
+    <p class="book-hero-subtitle">A Programmer's Guide to the New Paradigm — how the concepts, patterns, and principles of classical software engineering translate into the age of LLM-powered agents.</p>
+    <div class="book-hero-meta">
+      <span>17 chapters · 7 parts</span>
+    </div>
+  </div>
+
+  <!-- Introduction -->
+  <section class="part-section" style="margin-bottom:1.5rem">
+    <div class="chapter-row" style="border-bottom:1px solid var(--border)">
+      <div class="ch-num">Intro</div>
+      <div class="ch-body">
+        <div class="ch-title">Introduction</div>
+        <div class="ch-subtitle">A Translation Guide for Software Engineers Entering the Agentic Paradigm</div>
+        <div class="ch-links">
+          <a href="introduction.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">6 sections</div>
+    </div>
+  </section>
+
+  <!-- PART I -->
+  <section class="part-section">
+    <div class="part-header">
+      <span class="part-label">Part I</span>
+      <span class="part-name">The New Syntax</span>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 1</div>
+      <div class="ch-body">
+        <div class="ch-title">The Language Shift</div>
+        <div class="ch-subtitle">When Natural Language Became Code</div>
+        <div class="ch-links">
+          <a href="ch01.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">7 sections</div>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 2</div>
+      <div class="ch-body">
+        <div class="ch-title">The Fundamental Trilogy</div>
+        <div class="ch-subtitle">Model, Prompt, and Context as a Complete System</div>
+        <div class="ch-links">
+          <a href="ch02.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">7 sections</div>
+    </div>
+  </section>
+
+  <!-- PART II -->
+  <section class="part-section">
+    <div class="part-header">
+      <span class="part-label">Part II</span>
+      <span class="part-name">The New Memory</span>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 3</div>
+      <div class="ch-body">
+        <div class="ch-title">The Context Window</div>
+        <div class="ch-subtitle">RAM, Attention, and the Token Budget</div>
+        <div class="ch-links">
+          <a href="ch03.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">7 sections</div>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 4</div>
+      <div class="ch-body">
+        <div class="ch-title">Context Rot</div>
+        <div class="ch-subtitle">When Memory Becomes Noise</div>
+        <div class="ch-links">
+          <a href="ch04.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">7 sections</div>
+    </div>
+  </section>
+
+  <!-- PART III -->
+  <section class="part-section">
+    <div class="part-header">
+      <span class="part-label">Part III</span>
+      <span class="part-name">The New Control Flow</span>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 5</div>
+      <div class="ch-body">
+        <div class="ch-title">Semantic Routing</div>
+        <div class="ch-subtitle">The if/else That Understands Intent</div>
+        <div class="ch-links">
+          <a href="ch05.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">8 sections</div>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 6</div>
+      <div class="ch-body">
+        <div class="ch-title">Parallel Sub-Agents</div>
+        <div class="ch-subtitle">The for Loop That Applies Judgment</div>
+        <div class="ch-links">
+          <a href="ch06.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">9 sections</div>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 7</div>
+      <div class="ch-body">
+        <div class="ch-title">The Agentic Loop</div>
+        <div class="ch-subtitle">The while Loop That Knows When to Stop</div>
+        <div class="ch-links">
+          <a href="ch07.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">7 sections</div>
+    </div>
+  </section>
+
+  <!-- PART IV -->
+  <section class="part-section">
+    <div class="part-header">
+      <span class="part-label">Part IV</span>
+      <span class="part-name">The New Architecture</span>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 8</div>
+      <div class="ch-body">
+        <div class="ch-title">Dependency Injection for Agents</div>
+        <div class="ch-subtitle">From God Prompt to Composable Architecture</div>
+        <div class="ch-links">
+          <a href="ch08.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">7 sections</div>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 9</div>
+      <div class="ch-body">
+        <div class="ch-title">SOLID Principles for Agent Systems</div>
+        <div class="ch-subtitle">Why Fifty-Year-Old Rules Still Apply</div>
+        <div class="ch-links">
+          <a href="ch09.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">8 sections</div>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 10</div>
+      <div class="ch-body">
+        <div class="ch-title">Design Patterns in Multi-Agent Workflows</div>
+        <div class="ch-subtitle">Gang of Four Meets the LLM Runtime</div>
+        <div class="ch-links">
+          <a href="ch10.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">7 sections</div>
+    </div>
+  </section>
+
+  <!-- PART V -->
+  <section class="part-section">
+    <div class="part-header">
+      <span class="part-label">Part V</span>
+      <span class="part-name">The New Engineering Practices</span>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 11</div>
+      <div class="ch-body">
+        <div class="ch-title">TDD for Agents</div>
+        <div class="ch-subtitle">Eval-Driven Development and the New Test Suite</div>
+        <div class="ch-links">
+          <a href="ch11.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">5 sections</div>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 12</div>
+      <div class="ch-body">
+        <div class="ch-title">BDD for Agents</div>
+        <div class="ch-subtitle">Behavior as the Contract, Scenarios as the Specification</div>
+        <div class="ch-links">
+          <a href="ch12.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">7 sections</div>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 13</div>
+      <div class="ch-body">
+        <div class="ch-title">The Debugging Mindset</div>
+        <div class="ch-subtitle">Debug the Prompt, Not the Model</div>
+        <div class="ch-links">
+          <a href="ch13.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">7 sections</div>
+    </div>
+  </section>
+
+  <!-- PART VI -->
+  <section class="part-section">
+    <div class="part-header">
+      <span class="part-label">Part VI</span>
+      <span class="part-name">The New Security and Observability</span>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 14</div>
+      <div class="ch-body">
+        <div class="ch-title">Prompt Injection: The New SQL Injection</div>
+        <div class="ch-subtitle">Structural Separation Between Instructions and Data</div>
+        <div class="ch-links">
+          <a href="ch14.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">6 sections</div>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 15</div>
+      <div class="ch-body">
+        <div class="ch-title">Observability: Tracing Agent Reasoning</div>
+        <div class="ch-subtitle">You Cannot Debug What You Cannot See</div>
+        <div class="ch-links">
+          <a href="ch15.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">6 sections</div>
+    </div>
+  </section>
+
+  <!-- PART VII -->
+  <section class="part-section">
+    <div class="part-header">
+      <span class="part-label">Part VII</span>
+      <span class="part-name">The Future</span>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 16</div>
+      <div class="ch-body">
+        <div class="ch-title">Is Agentic Programming Turing Complete?</div>
+        <div class="ch-subtitle">The Theoretical Foundation of the Prompt as Program</div>
+        <div class="ch-links">
+          <a href="ch16.html">Read →</a>
+        </div>
+      </div>
+      <div class="ch-meta">5 sections</div>
+    </div>
+
+    <div class="chapter-row">
+      <div class="ch-num">Ch 17</div>
+      <div class="ch-body">
+        <div class="ch-title">The Orchestrator of Talents</div>
+        <div class="ch-subtitle">The 2026 Programmer's Job Description</div>
+        <div class="ch-links">
+          <a href="ch17.html">Read →</a>
+          <a href="ch17.html#appendix-a">Appendix A</a>
+        </div>
+      </div>
+      <div class="ch-meta">6 sections + Appendix A</div>
+    </div>
+  </section>
+
+  <footer class="index-footer">
+    <span>17 chapters · 7 parts · The Agentic Programming Language</span>
+    <span>© 2026 Nguyen Ngo</span>
+  </footer>
+
+</div><!-- /.page-wrap -->
+</body>
+</html>

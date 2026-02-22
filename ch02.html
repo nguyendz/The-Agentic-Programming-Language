@@ -1,0 +1,303 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 2 — The Fundamental Trilogy | The Agentic Programming Language</title>
+<link rel="stylesheet" href="reading.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="book-title">The Agentic Programming Language</a>
+  <div class="chapter-nav">
+    <a href="ch01.html">← Previous</a>
+    <a href="ch03.html">Next →</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <header class="chapter-header">
+    <div class="chapter-label">Chapter 2</div>
+    <h1 class="chapter-title">The Fundamental Trilogy</h1>
+    <p class="chapter-subtitle">Prompt, LLM, and Data</p>
+    <div class="chapter-meta">
+      <span>Part I — The New Syntax</span>
+      <span>7 sections</span>
+    </div>
+  </header>
+
+  <div class="prose">
+
+    <p>Every computing system, at its foundation, rests on three pillars: a language to express instructions, an engine to execute them, and data to operate on. These three elements are not optional or separable. Remove any one of them and you do not have a computing system — you have a component waiting to be assembled.</p>
+    <p>Traditional software engineering has its own trilogy: <strong>Source code</strong> (the language), <strong>the compiler or runtime</strong> (the execution engine), and <strong>the file system and databases</strong> (the data layer). Agentic programming has an equivalent trilogy that maps to these three pillars with near-perfect structural correspondence. Understanding this mapping is the diagnostic framework you will return to every time something goes wrong.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 2.1 — The Fundamental Trilogy: Side-by-Side Comparison</div>
+      <svg width="680" height="300" viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="170,30 60,250 280,250" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+        <text x="170" y="24" font-size="11" font-weight="700" fill="#1a2744" text-anchor="middle" font-family="Segoe UI,sans-serif">Traditional Computing</text>
+        <rect x="110" y="14" width="120" height="26" rx="6" fill="#1a2744"/>
+        <text x="170" y="32" font-size="11" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Source Code</text>
+        <rect x="18" y="258" width="100" height="26" rx="6" fill="#1a2744"/>
+        <text x="68" y="276" font-size="10" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Compiler/Runtime</text>
+        <rect x="212" y="258" width="100" height="26" rx="6" fill="#1a2744"/>
+        <text x="262" y="276" font-size="10" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">File System / DB</text>
+        <text x="100" y="160" font-size="9" fill="#374151" text-anchor="middle" transform="rotate(-54,100,160)" font-family="Segoe UI,sans-serif">executes</text>
+        <text x="240" y="160" font-size="9" fill="#374151" text-anchor="middle" transform="rotate(54,240,160)" font-family="Segoe UI,sans-serif">reads</text>
+        <text x="170" y="248" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">stores/retrieves</text>
+        <polygon points="510,30 400,250 620,250" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+        <text x="510" y="24" font-size="11" font-weight="700" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">Agentic Computing</text>
+        <rect x="450" y="14" width="120" height="26" rx="6" fill="#14532d"/>
+        <text x="510" y="32" font-size="11" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Prompt</text>
+        <rect x="356" y="258" width="90" height="26" rx="6" fill="#14532d"/>
+        <text x="401" y="276" font-size="10" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">LLM</text>
+        <rect x="556" y="258" width="106" height="26" rx="6" fill="#14532d"/>
+        <text x="609" y="276" font-size="10" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Context / RAG</text>
+        <text x="436" y="160" font-size="9" fill="#374151" text-anchor="middle" transform="rotate(-54,436,160)" font-family="Segoe UI,sans-serif">compiles</text>
+        <text x="580" y="160" font-size="9" fill="#374151" text-anchor="middle" transform="rotate(54,580,160)" font-family="Segoe UI,sans-serif">injects</text>
+        <text x="510" y="248" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">grounds / retrieves</text>
+        <line x1="295" y1="27" x2="385" y2="27" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="383,23 391,27 383,31" fill="#6b7280"/>
+        <line x1="124" y1="272" x2="350" y2="272" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="348,268 356,272 348,276" fill="#6b7280"/>
+        <text x="338" y="245" font-size="9" fill="#9ca3af" text-anchor="middle" font-family="Segoe UI,sans-serif">≡</text>
+        <text x="338" y="18" font-size="9" fill="#9ca3af" text-anchor="middle" font-family="Segoe UI,sans-serif">≡</text>
+      </svg>
+      <p class="diagram-caption">The structure is identical. The implementation is entirely different. Every agentic failure traces to exactly one vertex of the right triangle.</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>2.1 &nbsp; Axiom 1: The Prompt is the Programming Language</h2>
+    <p>A programming language is a formal system for expressing instructions to a machine. The prompt is a programming language by this definition — with one critical difference. Its "grammar" is not a formal specification; it is the statistical distribution of human language that the model was trained on. Its "compiler" does not check syntax; it infers semantics. And the mapping from prompt to behavior is probabilistic rather than deterministic.</p>
+    <p>This does not make the prompt a lesser language. It makes it a fundamentally different one.</p>
+
+    <h3>The Structure of a Well-Formed Prompt</h3>
+    <p>A well-formed prompt has identifiable structural components analogous to conventional source code:</p>
+    <p><strong>System Identity</strong> — Who is this agent? Analogous to a class definition. <strong>Context Injection</strong> — What does the agent need to know right now? Analogous to method arguments. <strong>The Task</strong> — What should the agent do? The imperative statement, equivalent to the function body. <strong>Output Constraints</strong> — What format must the output satisfy? The return type declaration.</p>
+
+    <div class="definition">
+      <strong>Prompt Ambiguity Bug</strong> — An instruction in a prompt that has more than one reasonable interpretation, causing the model to select one interpretation when the programmer intended another. The output is syntactically valid but semantically wrong.
+    </div>
+
+    <p>In a traditional language, a syntax error is immediately visible. In prompt programming, there are no syntax errors — the LLM will always produce <em>some</em> output, regardless of how poorly the prompt is written. The "syntax error" of the prompt is <strong>ambiguity</strong>, and it is silent.</p>
+
+    <hr class="section-divider">
+
+    <h2>2.2 &nbsp; Axiom 2: The LLM is the Compiler</h2>
+    <p>A compiler's job is translation: it takes source code written in a human-readable language and produces executable instructions. The LLM performs the same function. It takes the prompt — the source code — and produces output: text, structured data, tool calls, or chains of reasoning.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 2.2 — Deterministic vs. Probabilistic Compilation</div>
+      <svg width="680" height="220" viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+        <text x="170" y="20" font-size="12" font-weight="700" fill="#1a2744" text-anchor="middle" font-family="Segoe UI,sans-serif">Deterministic (Traditional)</text>
+        <rect x="60" y="34" width="220" height="38" rx="8" fill="#1a2744"/>
+        <text x="170" y="57" font-size="11" fill="white" text-anchor="middle" font-family="Cascadia Code,Consolas,monospace">Source Code + Input</text>
+        <line x1="170" y1="72" x2="170" y2="98" stroke="#374151" stroke-width="2"/>
+        <polygon points="165,96 170,106 175,96" fill="#374151"/>
+        <rect x="80" y="106" width="180" height="34" rx="8" fill="#2563eb"/>
+        <text x="170" y="127" font-size="11" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Compiler / Interpreter</text>
+        <line x1="170" y1="140" x2="170" y2="166" stroke="#374151" stroke-width="2"/>
+        <polygon points="165,164 170,174 175,164" fill="#374151"/>
+        <rect x="70" y="174" width="200" height="34" rx="8" fill="#16a34a"/>
+        <text x="170" y="192" font-size="12" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Output: always identical</text>
+        <line x1="340" y1="20" x2="340" y2="210" stroke="#e5e7eb" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="510" y="20" font-size="12" font-weight="700" fill="#1a2744" text-anchor="middle" font-family="Segoe UI,sans-serif">Probabilistic (Agentic)</text>
+        <rect x="400" y="34" width="220" height="38" rx="8" fill="#1a2744"/>
+        <text x="510" y="57" font-size="11" fill="white" text-anchor="middle" font-family="Cascadia Code,Consolas,monospace">Prompt + Context</text>
+        <line x1="510" y1="72" x2="510" y2="98" stroke="#374151" stroke-width="2"/>
+        <polygon points="505,96 510,106 515,96" fill="#374151"/>
+        <rect x="420" y="106" width="180" height="34" rx="8" fill="#7c3aed"/>
+        <text x="510" y="127" font-size="11" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">LLM (probabilistic)</text>
+        <line x1="510" y1="140" x2="455" y2="166" stroke="#374151" stroke-width="1.5"/>
+        <line x1="510" y1="140" x2="510" y2="166" stroke="#374151" stroke-width="1.5"/>
+        <line x1="510" y1="140" x2="565" y2="166" stroke="#374151" stroke-width="1.5"/>
+        <polygon points="450,164 455,174 460,164" fill="#374151"/>
+        <polygon points="505,164 510,174 515,164" fill="#374151"/>
+        <polygon points="560,164 565,174 570,164" fill="#374151"/>
+        <rect x="400" y="174" width="94" height="34" rx="6" fill="#d97706"/>
+        <text x="447" y="195" font-size="10" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Output A</text>
+        <rect x="463" y="174" width="94" height="34" rx="6" fill="#d97706" opacity="0.75"/>
+        <text x="510" y="195" font-size="10" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Output B</text>
+        <rect x="526" y="174" width="94" height="34" rx="6" fill="#d97706" opacity="0.5"/>
+        <text x="573" y="195" font-size="10" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Output C</text>
+        <text x="510" y="214" font-size="10" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">probable outputs — same on average, variable per call</text>
+      </svg>
+      <p class="diagram-caption">The LLM is not buggy when outputs vary — it is probabilistic by design. Engineering for this means specifying intent with enough precision that the distribution of outputs is acceptable, not just the mean.</p>
+    </div>
+
+    <h3>Model Versions as Compiler Versions</h3>
+    <p>Software engineers pin the compiler version in production and test upgrades explicitly. The same principle applies to LLMs. When a model is updated, the "compiler" has changed. A prompt that produced reliable JSON output under one model version may produce inconsistent formatting under the next.</p>
+    <p><strong>Practical implication:</strong> In production, pin the model version identifier (e.g., <code>gpt-4o-2024-08-06</code>, not <code>gpt-4o</code>). Test new model versions against your eval suite before upgrading. Treat a model upgrade with the same rigor as a dependency upgrade.</p>
+
+    <hr class="section-divider">
+
+    <h2>2.3 &nbsp; Axiom 3: Data is the New File System</h2>
+    <p>Traditional programs read from files, query databases, receive network responses. In agentic systems, data plays the same role — but the mechanism of access has changed entirely.</p>
+
+    <h3>The Three Data Access Patterns</h3>
+    <p><strong>Eager Injection (Context Stuffing)</strong> — Include all relevant data directly in the prompt. Analogous to passing all function arguments by value. Fast and simple, but consumes context window tokens and doesn't scale to large data volumes.</p>
+    <p><strong>Lazy Retrieval (RAG)</strong> — Store data in a vector database and retrieve only the semantically relevant chunks at query time. Analogous to a database query: the function knows how to fetch what it needs at runtime.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 2.3 — RAG Data Access Pattern</div>
+      <svg width="680" height="200" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="80" width="110" height="44" rx="8" fill="#1a2744"/>
+        <text x="75" y="100" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">User Query</text>
+        <text x="75" y="116" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">"Find revenue risks"</text>
+        <line x1="132" y1="102" x2="158" y2="102" stroke="#6b7280" stroke-width="1.5"/>
+        <polygon points="156,98 164,102 156,106" fill="#6b7280"/>
+        <rect x="162" y="68" width="120" height="68" rx="8" fill="#7c3aed"/>
+        <text x="222" y="92" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Retriever</text>
+        <text x="222" y="108" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Vector similarity</text>
+        <text x="222" y="122" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">search / keyword</text>
+        <line x1="284" y1="102" x2="310" y2="102" stroke="#6b7280" stroke-width="1.5"/>
+        <polygon points="308,98 316,102 308,106" fill="#6b7280"/>
+        <rect x="314" y="50" width="120" height="104" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+        <text x="374" y="72" font-size="10" font-weight="700" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">Document Store</text>
+        <text x="374" y="90" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">📄 Annual Reports</text>
+        <text x="374" y="106" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">📄 SEC Filings</text>
+        <text x="374" y="122" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">📄 News Articles</text>
+        <text x="374" y="138" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">📄 Analyst Notes</text>
+        <line x1="436" y1="102" x2="462" y2="102" stroke="#6b7280" stroke-width="1.5"/>
+        <polygon points="460,98 468,102 460,106" fill="#6b7280"/>
+        <text x="452" y="92" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">top-k chunks</text>
+        <rect x="466" y="56" width="120" height="92" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+        <text x="526" y="76" font-size="10" font-weight="700" fill="#92400e" text-anchor="middle" font-family="Segoe UI,sans-serif">Context Window</text>
+        <text x="526" y="94" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">[System Prompt]</text>
+        <text x="526" y="108" font-size="8" fill="#d97706" text-anchor="middle" font-family="Segoe UI,sans-serif">[Retrieved Chunks]</text>
+        <text x="526" y="122" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">[User Query]</text>
+        <text x="526" y="136" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">→ injected into LLM</text>
+        <line x1="588" y1="102" x2="614" y2="102" stroke="#6b7280" stroke-width="1.5"/>
+        <polygon points="612,98 620,102 612,106" fill="#6b7280"/>
+        <rect x="618" y="80" width="52" height="44" rx="8" fill="#2563eb"/>
+        <text x="644" y="100" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">LLM</text>
+        <text x="644" y="116" font-size="8" fill="#bfdbfe" text-anchor="middle" font-family="Segoe UI,sans-serif">responds</text>
+        <text x="75" y="140" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">① Query</text>
+        <text x="222" y="148" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">② Retrieve</text>
+        <text x="374" y="168" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">③ Match</text>
+        <text x="526" y="162" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">④ Assemble</text>
+        <text x="644" y="140" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">⑤ Reason</text>
+      </svg>
+      <p class="diagram-caption">RAG (Retrieval-Augmented Generation): the agent does not “know” the documents — it retrieves the most relevant chunks at inference time and reasons over them as injected context.</p>
+    </div>
+
+    <p><strong>Tool-Called Retrieval</strong> — The agent itself decides, mid-reasoning, that it needs specific data and calls a tool to retrieve it. Analogous to a function that issues a database query at runtime based on its input.</p>
+
+    <div class="code-label">Tool Definition Schema</div>
+    <pre><code>tools = [{
+    "name": "get_order_status",
+    "description": "Retrieves the current status of an order by order ID",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "order_id": {"type": "string"}
+        }
+    }
+}]</code></pre>
+
+    <h3>The Staleness Problem</h3>
+    <p>Data baked into a prompt at training time is frozen. Data injected at runtime is as fresh as the last database write. Data retrieved via live tool calls is as fresh as the underlying system. Choosing the right data access pattern is not just a performance decision — it is a correctness decision.</p>
+
+    <hr class="section-divider">
+
+    <h2>2.4 &nbsp; How the Trilogy Interacts</h2>
+    <p>The three elements form a cycle that runs for every agent invocation. The prompt tells the LLM what to do. The LLM determines what data it needs and calls tools to retrieve it. The retrieved data is added to the context, and the LLM continues reasoning with updated information. This cycle may repeat several times within a single agentic task before a final output is produced.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 2.4 — The Trilogy Interaction Cycle</div>
+      <svg width="680" height="240" viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <rect x="60" y="56" width="140" height="110" rx="10" fill="#1a2744"/>
+        <text x="130" y="85" font-size="13" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">PROMPT</text>
+        <text x="130" y="103" font-size="10" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">System prompt</text>
+        <text x="130" y="118" font-size="10" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">User message</text>
+        <text x="130" y="133" font-size="10" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Few-shot examples</text>
+        <text x="130" y="148" font-size="10" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">= the program</text>
+        <rect x="270" y="56" width="140" height="110" rx="10" fill="#7c3aed"/>
+        <text x="340" y="85" font-size="13" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">LLM</text>
+        <text x="340" y="103" font-size="10" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Transformer model</text>
+        <text x="340" y="118" font-size="10" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Probabilistic inference</text>
+        <text x="340" y="133" font-size="10" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Token prediction</text>
+        <text x="340" y="148" font-size="10" fill="#c4b5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">= the compiler</text>
+        <rect x="480" y="56" width="140" height="110" rx="10" fill="#14532d"/>
+        <text x="550" y="85" font-size="13" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">DATA</text>
+        <text x="550" y="103" font-size="10" fill="#86efac" text-anchor="middle" font-family="Segoe UI,sans-serif">Documents / RAG</text>
+        <text x="550" y="118" font-size="10" fill="#86efac" text-anchor="middle" font-family="Segoe UI,sans-serif">Databases</text>
+        <text x="550" y="133" font-size="10" fill="#86efac" text-anchor="middle" font-family="Segoe UI,sans-serif">API responses</text>
+        <text x="550" y="148" font-size="10" fill="#4ade80" text-anchor="middle" font-family="Segoe UI,sans-serif">= the data layer</text>
+        <path d="M200,100 Q235,80 270,100" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="235" y="76" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">instructs</text>
+        <path d="M410,100 Q445,80 480,100" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="445" y="76" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">retrieves</text>
+        <path d="M480,130 Q445,150 410,130" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="445" y="156" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">grounds response</text>
+        <path d="M270,130 Q235,150 200,130" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="235" y="156" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">output</text>
+        <rect x="60" y="186" width="560" height="46" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+        <text x="340" y="203" font-size="10" font-weight="700" fill="#92400e" text-anchor="middle" font-family="Segoe UI,sans-serif">Diagnostic Rule: When an agentic system fails, the fault is in exactly one of the three pillars.</text>
+        <text x="340" y="222" font-size="10" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Wrong output? → Check: Prompt (ambiguous?) | LLM (wrong model?) | Data (missing/incorrect?)</text>
+      </svg>
+      <p class="diagram-caption">Every agentic failure is traceable to one vertex of the trilogy. This is the diagnostic framework that replaces “the AI is broken.”</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>2.5 &nbsp; The Trilogy as a Diagnostic Framework</h2>
+    <p>When an agentic system produces wrong output, there are exactly three places to look — and only three:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Symptom</th><th>Most Likely Source</th><th>Diagnostic Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Wrong output, wrong reasoning</td><td>Prompt (language)</td><td>Review system prompt for ambiguity or missing constraints</td></tr>
+          <tr><td>Confident but factually wrong</td><td>Data (file system)</td><td>Verify retrieved data is accurate and complete</td></tr>
+          <tr><td>Worked yesterday, broken today</td><td>LLM (compiler)</td><td>Check if model version changed; re-run evals</td></tr>
+          <tr><td>Inconsistent across runs</td><td>LLM temperature or prompt ambiguity</td><td>Check temperature settings; look for underspecified instructions</td></tr>
+          <tr><td>Correct reasoning, wrong format</td><td>Prompt (output constraints)</td><td>Add or tighten output format specification</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>2.6 &nbsp; Versioning the Trilogy</h2>
+    <p>Stability in a production agentic system requires treating all three elements of the trilogy as versioned artifacts.</p>
+    <p><strong>Version your prompts.</strong> Store system prompts in version control alongside application code. Never edit a production prompt without the same review process as a code change. <strong>Pin your model versions.</strong> Use the specific model version identifier. Test upgrades against your eval suite before rolling out to production. <strong>Version your data schemas.</strong> When the structure of retrieved data changes, re-validate all prompts that depend on that structure.</p>
+
+    <hr class="section-divider">
+
+    <h2>2.7 &nbsp; Chapter Summary</h2>
+    <p>The Fundamental Trilogy is the first thing to understand and the last thing to lose sight of when building agentic systems: the Prompt is the programming language, the LLM is the compiler, and Data is the file system. All subsequent chapters describe techniques that are, at their core, ways of managing one or more elements of this trilogy with greater care and rigor.</p>
+
+    <div class="core-principle">
+      <div class="core-principle-label">Core Principle — Chapter 2</div>
+      <p>There is no fourth option. When an agentic system misbehaves, the fault is in the prompt, the data, or the model. <strong>When something is wrong, check the trilogy — in order. Start with the prompt. Almost always, the answer is there.</strong></p>
+    </div>
+
+  </div><!-- /.prose -->
+
+  <nav class="bottom-nav">
+    <a href="ch01.html">
+      <span class="nav-direction">← Previous</span>
+      <span class="nav-title">Chapter 1 — The Language Shift</span>
+    </a>
+    <a href="ch03.html" class="next">
+      <span class="nav-direction">Next →</span>
+      <span class="nav-title">Chapter 3 — The Context Window</span>
+    </a>
+  </nav>
+
+</div><!-- /.page-wrap -->
+
+<footer class="site-copyright">&copy; 2026 Nguyen Ngo &middot; The Agentic Programming Language</footer>
+</body>
+</html>

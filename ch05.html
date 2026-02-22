@@ -1,0 +1,311 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 5 — Semantic Routing | The Agentic Programming Language</title>
+<link rel="stylesheet" href="reading.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="book-title">The Agentic Programming Language</a>
+  <div class="chapter-nav">
+    <a href="ch04.html">← Previous</a>
+    <a href="ch06.html">Next →</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <header class="chapter-header">
+    <div class="chapter-label">Chapter 5</div>
+    <h1 class="chapter-title">Semantic Routing</h1>
+    <p class="chapter-subtitle">The New If/Then</p>
+    <div class="chapter-meta">
+      <span>Part III — The New Control Flow</span>
+      <span>8 sections</span>
+    </div>
+  </header>
+
+  <div class="prose">
+
+    <p>In traditional code, branching is deterministic and syntactically explicit — boolean conditions, typed inputs, exhaustively enumerated branches. This works correctly when every relevant condition is enumerable in advance. When inputs are natural language, that assumption breaks.</p>
+    <p>Consider: <em>"My order hasn't shown up and I've already been waiting for two weeks — this is getting ridiculous."</em> Is it a complaint? A refund request? An order status inquiry? An escalation? Probably all four, weighted differently. No boolean expression can evaluate this sentence reliably.</p>
+    <p>The <strong>Semantic Router</strong> replaces boolean evaluation with intent classification — using the LLM itself to determine which branch of execution a given input should activate.</p>
+
+    <hr class="section-divider">
+
+    <h2>5.1 &nbsp; The Limits of Enumerated Branching</h2>
+    <p>The traditional <code>if/then</code> construct has one foundational assumption: the programmer can enumerate, in advance, all the conditions that matter. This assumption holds for well-defined state machines. It breaks down entirely for open-ended natural language input.</p>
+    <p>Human language has infinite surface variation over a finite number of intents. Keyword matching and enumerated conditions can cover the common cases, but the tail is long — and in production systems, the tail is where the most frustrated users live. "I want my money back," "Is there any way to undo my purchase?" and "I'm incredibly frustrated" all have no keyword match in a routing table, yet all require specific handling.</p>
+
+    <hr class="section-divider">
+
+    <h2>5.2 &nbsp; What is a Semantic Router?</h2>
+    <p>A Semantic Router is a specialized component — typically implemented as a focused LLM call — whose sole job is to classify a user's input into a predefined intent category, and return a structured routing decision that the orchestration layer can act on.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 5.1 — Semantic Router Architecture</div>
+      <svg width="680" height="260" viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr5" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <rect x="20" y="100" width="110" height="44" rx="8" fill="#1a2744"/>
+        <text x="75" y="118" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">User Input</text>
+        <text x="75" y="133" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">(free text)</text>
+        <line x1="130" y1="122" x2="165" y2="122" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5)"/>
+        <rect x="168" y="72" width="160" height="100" rx="10" fill="#7c3aed"/>
+        <text x="248" y="96" font-size="12" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Semantic Router</text>
+        <rect x="184" y="104" width="128" height="18" rx="4" fill="#6d28d9"/>
+        <text x="248" y="117" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">1. Embed input</text>
+        <rect x="184" y="126" width="128" height="18" rx="4" fill="#6d28d9"/>
+        <text x="248" y="139" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">2. Compare to route templates</text>
+        <rect x="184" y="148" width="128" height="18" rx="4" fill="#6d28d9"/>
+        <text x="248" y="161" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">3. Select max cosine similarity</text>
+        <line x1="328" y1="96" x2="370" y2="60" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5)"/>
+        <rect x="370" y="36" width="130" height="48" rx="8" fill="#16a34a"/>
+        <text x="435" y="57" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Code Agent</text>
+        <text x="435" y="72" font-size="9" fill="#dcfce7" text-anchor="middle" font-family="Segoe UI,sans-serif">"write", "debug", "refactor"</text>
+        <line x1="328" y1="110" x2="370" y2="110" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5)"/>
+        <rect x="370" y="87" width="130" height="48" rx="8" fill="#2563eb"/>
+        <text x="435" y="108" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Research Agent</text>
+        <text x="435" y="123" font-size="9" fill="#bfdbfe" text-anchor="middle" font-family="Segoe UI,sans-serif">"find", "explain", "list"</text>
+        <line x1="328" y1="130" x2="370" y2="158" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5)"/>
+        <rect x="370" y="136" width="130" height="48" rx="8" fill="#d97706"/>
+        <text x="435" y="157" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Data Agent</text>
+        <text x="435" y="172" font-size="9" fill="#fef3c7" text-anchor="middle" font-family="Segoe UI,sans-serif">"chart", "analyze", "query"</text>
+        <line x1="328" y1="150" x2="370" y2="208" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5)"/>
+        <rect x="370" y="186" width="130" height="48" rx="8" fill="#dc2626"/>
+        <text x="435" y="207" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Fallback Handler</text>
+        <text x="435" y="222" font-size="9" fill="#fecaca" text-anchor="middle" font-family="Segoe UI,sans-serif">below confidence threshold</text>
+        <line x1="500" y1="60" x2="560" y2="122" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="500" y1="111" x2="560" y2="122" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="500" y1="160" x2="560" y2="122" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="500" y1="210" x2="560" y2="122" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,2"/>
+        <rect x="556" y="98" width="104" height="48" rx="8" fill="#1a2744"/>
+        <text x="608" y="118" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Specialist</text>
+        <text x="608" y="133" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Agent Invoked</text>
+        <rect x="168" y="186" width="160" height="40" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+        <text x="248" y="203" font-size="9" font-weight="700" fill="#92400e" text-anchor="middle" font-family="Segoe UI,sans-serif">Threshold matters</text>
+        <text x="248" y="218" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Too low → wrong route; Too high → excess fallback</text>
+      </svg>
+      <p class="diagram-caption">The semantic router converts a free-text input into a routing decision using vector embedding similarity — no keyword matching required. The confidence threshold is the key tuning parameter.</p>
+    </div>
+
+    <p>The router is deliberately narrow in scope. It does not try to answer the user's question. It does one thing: determine the category of intent and emit a structured output. This makes it testable, replaceable, and cheap to run — classification calls can use fast, inexpensive models rather than expensive reasoning models.</p>
+
+    <hr class="section-divider">
+
+    <h2>5.3 &nbsp; Implementing a Semantic Router</h2>
+
+    <div class="code-label">Classification Prompt</div>
+    <div class="prompt-block">You are an intent classifier for a customer support system.
+Classify the user's message into exactly one of the following intent categories:
+
+- refund_request: The user wants a refund or return
+- order_status: The user wants to know where their order is
+- product_complaint: The user is reporting a problem with a product
+- escalation_request: The user is expressing serious frustration or demanding to speak to a manager
+- general_inquiry: Any other question or request
+
+Respond with a JSON object:
+{
+  "intent": "&lt;category&gt;",
+  "confidence": &lt;0.0 to 1.0&gt;,
+  "reasoning": "&lt;one sentence explaining your classification&gt;"
+}</div>
+
+    <h3>Few-Shot Examples: Improving Classification Precision</h3>
+    <p>Few-shot examples dramatically improve consistency, especially at the edges of category boundaries. They communicate expected behavior through demonstration rather than abstract description:</p>
+
+    <div class="code-label">Few-Shot Examples</div>
+    <pre><code>Examples:
+User: "I never received my package and it's been 3 weeks"
+→ { "intent": "order_status", "confidence": 0.88 }
+
+User: "I want to return this immediately and get a full refund"
+→ { "intent": "refund_request", "confidence": 0.97 }
+
+User: "I've called three times and nobody has helped me"
+→ { "intent": "escalation_request", "confidence": 0.91 }
+
+User: "Do you sell gift cards?"
+→ { "intent": "general_inquiry", "confidence": 0.95 }</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>5.4 &nbsp; Semantic Router vs. Boolean Branching</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Dimension</th><th>Traditional If/Then</th><th>Semantic Router</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Condition type</td><td>Boolean expression</td><td>Intent classification</td></tr>
+          <tr><td>Inputs handled</td><td>Enumerated, exact-match</td><td>Open-ended, natural language</td></tr>
+          <tr><td>Coverage of new cases</td><td>Requires new <code>else if</code> branch</td><td>Often generalizes to unseen inputs</td></tr>
+          <tr><td>Failure mode</td><td>Unhandled exception / default fallback</td><td>Misclassification (wrong category)</td></tr>
+          <tr><td>Testing</td><td>Enumerate all branch conditions</td><td>Build a golden dataset of labeled inputs</td></tr>
+          <tr><td>Explainability</td><td>Fully deterministic and auditable</td><td>Probabilistic; requires confidence scores and reasoning traces</td></tr>
+          <tr><td>Extensibility</td><td>Add new branch in code</td><td>Add new category to the prompt and golden dataset</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 5.2 — Classic Branching vs. Semantic Routing: Input Coverage</div>
+      <svg width="680" height="220" viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+        <text x="170" y="18" font-size="12" font-weight="700" fill="#dc2626" text-anchor="middle" font-family="Segoe UI,sans-serif">Classic if-else</text>
+        <rect x="100" y="26" width="140" height="28" rx="6" fill="#374151"/>
+        <text x="170" y="45" font-size="10" fill="white" text-anchor="middle" font-family="Cascadia Code,Consolas,monospace">if "write" in input:</text>
+        <line x1="170" y1="54" x2="170" y2="68" stroke="#374151" stroke-width="1.5"/>
+        <rect x="100" y="68" width="140" height="28" rx="6" fill="#374151"/>
+        <text x="170" y="87" font-size="10" fill="white" text-anchor="middle" font-family="Cascadia Code,Consolas,monospace">elif "debug" in input:</text>
+        <line x1="170" y1="96" x2="170" y2="110" stroke="#374151" stroke-width="1.5"/>
+        <rect x="100" y="110" width="140" height="28" rx="6" fill="#374151"/>
+        <text x="170" y="129" font-size="10" fill="white" text-anchor="middle" font-family="Cascadia Code,Consolas,monospace">elif "analyze" in input:</text>
+        <line x1="170" y1="138" x2="170" y2="152" stroke="#374151" stroke-width="1.5"/>
+        <rect x="90" y="152" width="160" height="28" rx="6" fill="#dc2626"/>
+        <text x="170" y="171" font-size="10" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">else: ??? (unhandled)</text>
+        <rect x="24" y="152" width="58" height="44" rx="4" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+        <text x="53" y="168" font-size="8" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">❌ "create"</text>
+        <text x="53" y="181" font-size="8" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">❌ "make"</text>
+        <text x="53" y="194" font-size="8" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">❌ "build"</text>
+        <text x="53" y="207" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">unmatched</text>
+        <line x1="340" y1="14" x2="340" y2="214" stroke="#e5e7eb" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="510" y="18" font-size="12" font-weight="700" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">Semantic Router</text>
+        <ellipse cx="460" cy="100" rx="68" ry="40" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5" opacity="0.7"/>
+        <text x="460" y="95" font-size="9" font-weight="700" fill="#1e40af" text-anchor="middle" font-family="Segoe UI,sans-serif">Code Zone</text>
+        <text x="432" y="108" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">write / create /</text>
+        <text x="432" y="119" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">build / make</text>
+        <ellipse cx="548" cy="80" rx="60" ry="34" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5" opacity="0.7"/>
+        <text x="560" y="75" font-size="9" font-weight="700" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">Research Zone</text>
+        <text x="560" y="87" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">find / explain…</text>
+        <ellipse cx="510" cy="148" rx="62" ry="36" fill="#fef3c7" stroke="#d97706" stroke-width="1.5" opacity="0.7"/>
+        <text x="510" y="143" font-size="9" font-weight="700" fill="#78350f" text-anchor="middle" font-family="Segoe UI,sans-serif">Data Zone</text>
+        <text x="510" y="155" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">chart / analyze…</text>
+        <text x="390" y="175" font-size="8" fill="#374151" font-family="Segoe UI,sans-serif">Overlap = ambiguous intent</text>
+        <text x="390" y="188" font-size="8" fill="#374151" font-family="Segoe UI,sans-serif">→ LLM disambiguates</text>
+        <text x="390" y="201" font-size="8" fill="#16a34a" font-family="Segoe UI,sans-serif">✓ "create", "build", "make" all hit Code Zone</text>
+      </svg>
+      <p class="diagram-caption">Classical if-else chains fail on synonyms and paraphrases. Semantic routing covers intent zones — clusters of semantically similar expressions — so no “unexpected” input falls through to an unhandled else.</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>5.5 &nbsp; Nested Routing: The Semantic Switch/Case</h2>
+    <p>Complex systems often require hierarchical routing: a primary classification determines the broad category, and a secondary classification refines the specific handling within that category. This is the semantic equivalent of a <code>switch/case</code> statement with nested cases.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 5.3 — Nested Semantic Router: Two-Level Intent Tree</div>
+      <svg width="680" height="220" viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr5b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <rect x="20" y="88" width="80" height="36" rx="6" fill="#1a2744"/>
+        <text x="60" y="110" font-size="10" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">User Input</text>
+        <line x1="100" y1="106" x2="130" y2="106" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5b)"/>
+        <rect x="132" y="74" width="120" height="64" rx="8" fill="#7c3aed"/>
+        <text x="192" y="96" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">L1 Router</text>
+        <text x="192" y="111" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Domain classifier</text>
+        <text x="192" y="125" font-size="8" fill="#c4b5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Code | Data | Infra | Other</text>
+        <line x1="252" y1="92" x2="318" y2="58" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5b)"/>
+        <line x1="252" y1="106" x2="318" y2="106" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5b)"/>
+        <line x1="252" y1="120" x2="318" y2="152" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr5b)"/>
+        <rect x="318" y="34" width="110" height="48" rx="8" fill="#2563eb"/>
+        <text x="373" y="54" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Code L2</text>
+        <text x="373" y="69" font-size="9" fill="#bfdbfe" text-anchor="middle" font-family="Segoe UI,sans-serif">Python | JS | SQL | Shell</text>
+        <rect x="318" y="82" width="110" height="48" rx="8" fill="#2563eb"/>
+        <text x="373" y="101" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Data L2</text>
+        <text x="373" y="116" font-size="9" fill="#bfdbfe" text-anchor="middle" font-family="Segoe UI,sans-serif">Query | Visualize | Export</text>
+        <rect x="318" y="130" width="110" height="48" rx="8" fill="#2563eb"/>
+        <text x="373" y="149" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Infra L2</text>
+        <text x="373" y="164" font-size="9" fill="#bfdbfe" text-anchor="middle" font-family="Segoe UI,sans-serif">Deploy | Monitor | Scale</text>
+        <line x1="428" y1="58" x2="474" y2="42" stroke="#e5e7eb" stroke-width="1" marker-end="url(#arr5b)"/>
+        <line x1="428" y1="58" x2="474" y2="70" stroke="#e5e7eb" stroke-width="1" marker-end="url(#arr5b)"/>
+        <rect x="474" y="28" width="90" height="28" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+        <text x="519" y="46" font-size="9" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">Python Agent</text>
+        <rect x="474" y="58" width="90" height="28" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+        <text x="519" y="76" font-size="9" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">JS Agent</text>
+        <line x1="428" y1="106" x2="474" y2="96" stroke="#e5e7eb" stroke-width="1" marker-end="url(#arr5b)"/>
+        <line x1="428" y1="106" x2="474" y2="120" stroke="#e5e7eb" stroke-width="1" marker-end="url(#arr5b)"/>
+        <rect x="474" y="82" width="90" height="28" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+        <text x="519" y="100" font-size="9" fill="#78350f" text-anchor="middle" font-family="Segoe UI,sans-serif">Query Agent</text>
+        <rect x="474" y="112" width="90" height="28" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+        <text x="519" y="130" font-size="9" fill="#78350f" text-anchor="middle" font-family="Segoe UI,sans-serif">Viz Agent</text>
+        <line x1="428" y1="154" x2="474" y2="148" stroke="#e5e7eb" stroke-width="1" marker-end="url(#arr5b)"/>
+        <line x1="428" y1="154" x2="474" y2="170" stroke="#e5e7eb" stroke-width="1" marker-end="url(#arr5b)"/>
+        <rect x="474" y="134" width="90" height="28" rx="6" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1"/>
+        <text x="519" y="152" font-size="9" fill="#4c1d95" text-anchor="middle" font-family="Segoe UI,sans-serif">Deploy Agent</text>
+        <rect x="474" y="164" width="90" height="28" rx="6" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1"/>
+        <text x="519" y="182" font-size="9" fill="#4c1d95" text-anchor="middle" font-family="Segoe UI,sans-serif">Monitor Agent</text>
+        <rect x="60" y="174" width="240" height="40" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+        <text x="180" y="191" font-size="9" font-weight="700" fill="#1e40af" text-anchor="middle" font-family="Segoe UI,sans-serif">Each L1 decision costs 1 classification call</text>
+        <text x="180" y="206" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Each L2 decision costs 1 more → total overhead: ~2 calls</text>
+      </svg>
+      <p class="diagram-caption">Two-level routing contains the classification problem at each level, keeping each router simple. Deeply nested trees (3+) levels add latency without proportional precision gains — prefer flat+wide over deep+narrow.</p>
+    </div>
+
+    <p>The design principle: <strong>each router in the hierarchy should be narrow in scope.</strong> A single router that classifies 50 distinct, specific intents is fragile. A two-level hierarchy with 5 primary intents and 5–10 secondary intents per category is more robust because each router has a limited, well-defined task.</p>
+
+    <hr class="section-divider">
+
+    <h2>5.6 &nbsp; Confidence Thresholds and Fallback Handling</h2>
+    <p>A semantic router operating in production must handle uncertainty explicitly. An input with ambiguous intent should not be silently routed to a randomly chosen handler — it should trigger a fallback mechanism.</p>
+
+    <div class="code-label">Route with Confidence Threshold</div>
+    <pre><code>def route(user_input: str, threshold: float = 0.75) -> str:
+    result = classifier_llm.call(
+        system_prompt=CLASSIFICATION_PROMPT,
+        user_message=user_input
+    )
+    
+    if result["confidence"] >= threshold:
+        return result["intent"]
+    else:
+        # Below threshold: ask for clarification
+        return "clarification_required"</code></pre>
+
+    <p>When confidence falls below the threshold, the appropriate response is to ask the user for clarification — not to guess:</p>
+    <div class="prompt-block">I want to make sure I understand your request correctly. Are you looking to: (a) check the status of your order, or (b) request a refund?</div>
+
+    <hr class="section-divider">
+
+    <h2>5.7 &nbsp; Evaluating a Semantic Router</h2>
+    <p>A semantic router is a production system component requiring the same evaluation rigor as any other component (Chapter 11). Because the output is categorical, evaluation is more straightforward than for generative agents — but the methodology is the same.</p>
+    <p><strong>Golden Dataset:</strong> A labeled dataset of user inputs with their correct intent categories. Minimum 20–30 examples per category, with emphasis on edge cases. <strong>Metrics:</strong> Accuracy per category, confusion matrix (which categories are most commonly confused), and confidence calibration. <strong>Edge case coverage:</strong> Short ambiguous messages ("help"), highly emotional messages, multi-intent messages, and messages that test category boundaries.</p>
+
+    <hr class="section-divider">
+
+    <h2>5.8 &nbsp; Chapter Summary</h2>
+    <p>The <code>if/then</code> statement branches on truth. The Semantic Router branches on intent. This distinction — from evaluating a condition to classifying a meaning — is the fundamental architectural move that makes conversational agents possible. The router does one job, intent categories should be mutually exclusive and collectively exhaustive, few-shot examples are essential, confidence thresholds prevent silent misrouting, and the router requires evals.</p>
+
+    <div class="core-principle">
+      <div class="core-principle-label">Core Principle — Chapter 5</div>
+      <p>The <code>if/then</code> statement asks "Is this true?" The semantic router asks "What does this mean?" <strong>One evaluates a condition. The other understands intent. This is the difference between a machine that reacts and an agent that reasons.</strong></p>
+    </div>
+
+  </div><!-- /.prose -->
+
+  <nav class="bottom-nav">
+    <a href="ch04.html">
+      <span class="nav-direction">← Previous</span>
+      <span class="nav-title">Chapter 4 — Context Rot</span>
+    </a>
+    <a href="ch06.html" class="next">
+      <span class="nav-direction">Next →</span>
+      <span class="nav-title">Chapter 6 — Parallel Sub-Agents</span>
+    </a>
+  </nav>
+
+</div><!-- /.page-wrap -->
+
+<footer class="site-copyright">&copy; 2026 Nguyen Ngo &middot; The Agentic Programming Language</footer>
+</body>
+</html>

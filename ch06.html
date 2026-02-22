@@ -1,0 +1,340 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 6 — Parallel Sub-Agents | The Agentic Programming Language</title>
+<link rel="stylesheet" href="reading.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="book-title">The Agentic Programming Language</a>
+  <div class="chapter-nav">
+    <a href="ch05.html">← Previous</a>
+    <a href="ch07.html">Next →</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <header class="chapter-header">
+    <div class="chapter-label">Chapter 6</div>
+    <h1 class="chapter-title">Parallel Sub-Agents</h1>
+    <p class="chapter-subtitle">The New For Loop</p>
+    <div class="chapter-meta">
+      <span>Part III — The New Control Flow</span>
+      <span>9 sections</span>
+    </div>
+  </header>
+
+  <div class="prose">
+
+    <p>The <code>for</code> loop assumes the operation being applied is <strong>uniform</strong> — the same function, the same logic, applied identically to every element. This assumption breaks down when inputs are heterogeneous and unstructured: each element requiring different handling, the "operation" must adapt to what it finds.</p>
+    <p>The <strong>Parallel Sub-Agent</strong> pattern is the evolution of the <code>for</code> loop for intelligence-intensive work. Instead of applying the same function to each element, you dispatch an intelligent agent to handle each element — an agent that can reason about what it finds, adapt its approach, recover from failures, and produce a result appropriate for that specific input.</p>
+
+    <hr class="section-divider">
+
+    <h2>6.1 &nbsp; The For Loop: Power and Limits</h2>
+    <p><strong>Where it shines</strong> — processing structured, homogeneous data: every order has the same structure, <code>calculate_tax</code> takes a known input type and returns a known output type. The loop is correct, efficient, and easy to reason about.</p>
+    <p><strong>Where it strains</strong> — processing unstructured, heterogeneous data: 50 annual reports in various formats (PDF, HTML, Excel, or 404). Some in English, some in Japanese. Some are 20 pages, some are 300. The loop structure is there, but the loop <em>body</em> has exploded into conditional handling paths that only cover anticipated edge cases. Every unanticipated format is a potential failure.</p>
+    <p>This is the problem that Parallel Sub-Agents solve: not iteration, but <strong>intelligent delegation at scale</strong>.</p>
+
+    <hr class="section-divider">
+
+    <h2>6.2 &nbsp; Parallel Sub-Agents: Delegation at Scale</h2>
+    <p>A Parallel Sub-Agent pattern works as follows: a <strong>Manager Agent</strong> receives a collection of tasks and decomposes them into independent work items. For each work item, the Manager spawns a <strong>Sub-Agent</strong> with focused instructions. Sub-Agents execute concurrently. A <strong>Synthesizer Agent</strong> collects results and merges them into a coherent final output.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 6.1 — Parallel Sub-Agent Architecture: Fan-Out / Fan-In</div>
+      <svg width="680" height="220" viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr6" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+      </marker>
+    </defs>
+
+    <!-- Orchestrator -->
+    <rect x="20" y="80" width="130" height="56" rx="8" fill="#1a2744"/>
+    <text x="85" y="103" font-size="11" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Orchestrator</text>
+    <text x="85" y="119" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Decomposes task</text>
+    <text x="85" y="132" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">into N sub-tasks</text>
+
+    <!-- Fan-out arrows -->
+    <line x1="150" y1="100" x2="246" y2="48" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr6)"/>
+    <line x1="150" y1="108" x2="246" y2="108" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr6)"/>
+    <line x1="150" y1="116" x2="246" y2="168" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr6)"/>
+    <text x="196" y="92" font-size="9" fill="#2563eb" text-anchor="middle" font-family="Segoe UI,sans-serif">fan-out</text>
+    <text x="196" y="105" font-size="9" fill="#2563eb" text-anchor="middle" font-family="Segoe UI,sans-serif">(parallel)</text>
+
+    <!-- Sub-agents -->
+    <rect x="248" y="24" width="120" height="48" rx="8" fill="#7c3aed"/>
+    <text x="308" y="43" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Sub-Agent A</text>
+    <text x="308" y="59" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Task slice 1</text>
+
+    <rect x="248" y="84" width="120" height="48" rx="8" fill="#7c3aed"/>
+    <text x="308" y="103" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Sub-Agent B</text>
+    <text x="308" y="119" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Task slice 2</text>
+
+    <rect x="248" y="144" width="120" height="48" rx="8" fill="#7c3aed"/>
+    <text x="308" y="163" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Sub-Agent C</text>
+    <text x="308" y="179" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">Task slice 3</text>
+
+    <!-- Fan-in arrows -->
+    <line x1="368" y1="48" x2="434" y2="98" stroke="#16a34a" stroke-width="2" marker-end="url(#arr6)"/>
+    <line x1="368" y1="108" x2="434" y2="108" stroke="#16a34a" stroke-width="2" marker-end="url(#arr6)"/>
+    <line x1="368" y1="168" x2="434" y2="118" stroke="#16a34a" stroke-width="2" marker-end="url(#arr6)"/>
+    <text x="404" y="88" font-size="9" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">fan-in</text>
+    <text x="404" y="101" font-size="9" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">(collect)</text>
+
+    <!-- Aggregator -->
+    <rect x="436" y="80" width="120" height="56" rx="8" fill="#14532d"/>
+    <text x="496" y="103" font-size="11" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Aggregator</text>
+    <text x="496" y="119" font-size="9" fill="#86efac" text-anchor="middle" font-family="Segoe UI,sans-serif">Merges + ranks</text>
+    <text x="496" y="132" font-size="9" fill="#86efac" text-anchor="middle" font-family="Segoe UI,sans-serif">sub-results</text>
+
+    <!-- Final output arrow -->
+    <line x1="556" y1="108" x2="618" y2="108" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr6)"/>
+    <rect x="620" y="88" width="52" height="40" rx="6" fill="#1a2744"/>
+    <text x="646" y="108" font-size="9" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Final</text>
+    <text x="646" y="121" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Output</text>
+
+    <!-- Time comparison -->
+    <rect x="20" y="178" width="290" height="36" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+    <text x="165" y="194" font-size="9" font-weight="700" fill="#92400e" text-anchor="middle" font-family="Segoe UI,sans-serif">Sequential: T_total = T_A + T_B + T_C</text>
+    <text x="165" y="208" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">(e.g., 3 × 8s = 24s)</text>
+    <rect x="330" y="178" width="290" height="36" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+    <text x="475" y="194" font-size="9" font-weight="700" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">Parallel: T_total = max(T_A, T_B, T_C)</text>
+    <text x="475" y="208" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">(e.g., max(8,7,9) = 9s) — 2.7× faster</text>
+      </svg>
+      <p class="diagram-caption">Fan-out parallelises independent sub-tasks; fan-in collects and synthesises results. The speed gain equals the sequential sum minus the longest individual task — only valid when tasks are genuinely independent.</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>6.3 &nbsp; The Evolution of Iteration</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Traditional For Loop</th><th>Parallel Sub-Agents</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Execution model</td><td>Sequential (or simple parallelism)</td><td>Concurrent with independent reasoning per item</td></tr>
+          <tr><td>Logic type</td><td>Static — same function for every item</td><td>Dynamic — each agent adapts to its specific input</td></tr>
+          <tr><td>Data requirements</td><td>Homogeneous, structured, typed</td><td>Heterogeneous, unstructured, variable</td></tr>
+          <tr><td>Failure mode</td><td>One unhandled exception can break the loop</td><td>Individual agents retry, skip, or escalate independently</td></tr>
+          <tr><td>Output type</td><td>Uniform — same type for every element</td><td>Diverse — each agent may produce different structure</td></tr>
+          <tr><td>Debugging</td><td>Identify the failing element; check the function</td><td>Identify the failing agent; read its reasoning trace</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>6.4 &nbsp; Semantic Map-Reduce</h2>
+    <p>Parallel Sub-Agents implement a <strong>Semantic Map-Reduce</strong>. In classic MapReduce (Google, 2004), the Map function is pure and deterministic. In Semantic Map-Reduce, the Map phase is a reasoning process and the Reduce phase (Synthesize) is also a reasoning process — resolving conflicts, identifying gaps, drawing cross-item inferences.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 6.2 — Classic MapReduce vs. Semantic Map-Reduce</div>
+      <svg width="680" height="200" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Left: Classic MapReduce -->
+    <text x="170" y="18" font-size="12" font-weight="700" fill="#1a2744" text-anchor="middle" font-family="Segoe UI,sans-serif">Classic MapReduce</text>
+    <!-- Data shards -->
+    <rect x="20" y="28" width="60" height="28" rx="4" fill="#374151"/>
+    <text x="50" y="46" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Chunk A</text>
+    <rect x="92" y="28" width="60" height="28" rx="4" fill="#374151"/>
+    <text x="122" y="46" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Chunk B</text>
+    <rect x="164" y="28" width="60" height="28" rx="4" fill="#374151"/>
+    <text x="194" y="46" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Chunk C</text>
+
+    <!-- Map workers -->
+    <text x="50" y="72" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">↓ map(count)</text>
+    <text x="122" y="72" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">↓ map(count)</text>
+    <text x="194" y="72" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">↓ map(count)</text>
+    <rect x="20" y="78" width="60" height="28" rx="4" fill="#2563eb"/>
+    <text x="50" y="96" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">{w:3,x:1}</text>
+    <rect x="92" y="78" width="60" height="28" rx="4" fill="#2563eb"/>
+    <text x="122" y="96" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">{w:2,y:4}</text>
+    <rect x="164" y="78" width="60" height="28" rx="4" fill="#2563eb"/>
+    <text x="194" y="96" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">{x:1,z:2}</text>
+
+    <!-- Reduce -->
+    <path d="M50,106 L122,126 M122,106 L122,126 M194,106 L122,126" stroke="#6b7280" stroke-width="1.5"/>
+    <rect x="72" y="124" width="100" height="28" rx="4" fill="#16a34a"/>
+    <text x="122" y="141" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">reduce: sum keys</text>
+
+    <!-- Result -->
+    <rect x="72" y="162" width="100" height="28" rx="6" fill="#1a2744"/>
+    <text x="122" y="179" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">{w:5,x:2,y:4,z:2}</text>
+
+    <!-- Divider -->
+    <line x1="340" y1="14" x2="340" y2="200" stroke="#e5e7eb" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+    <!-- Right: Semantic MapReduce -->
+    <text x="510" y="18" font-size="12" font-weight="700" fill="#7c3aed" text-anchor="middle" font-family="Segoe UI,sans-serif">Semantic Map-Reduce</text>
+    <rect x="360" y="28" width="60" height="28" rx="4" fill="#374151"/>
+    <text x="390" y="46" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Doc A</text>
+    <rect x="432" y="28" width="60" height="28" rx="4" fill="#374151"/>
+    <text x="462" y="46" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Doc B</text>
+    <rect x="504" y="28" width="60" height="28" rx="4" fill="#374151"/>
+    <text x="534" y="46" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Doc C</text>
+
+    <!-- Map agents -->
+    <text x="390" y="72" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">↓ LLM(extract)</text>
+    <text x="462" y="72" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">↓ LLM(extract)</text>
+    <text x="534" y="72" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">↓ LLM(extract)</text>
+    <rect x="360" y="78" width="60" height="28" rx="4" fill="#7c3aed"/>
+    <text x="390" y="92" font-size="8" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Risks: A1,A2</text>
+    <rect x="432" y="78" width="60" height="28" rx="4" fill="#7c3aed"/>
+    <text x="462" y="92" font-size="8" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Risks: B1,B3</text>
+    <rect x="504" y="78" width="60" height="28" rx="4" fill="#7c3aed"/>
+    <text x="534" y="92" font-size="8" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Risks: A2,C1</text>
+
+    <!-- Reduce agent -->
+    <path d="M390,106 L462,126 M462,106 L462,126 M534,106 L462,126" stroke="#6b7280" stroke-width="1.5"/>
+    <rect x="406" y="124" width="112" height="28" rx="4" fill="#16a34a"/>
+    <text x="462" y="138" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">LLM(deduplicate + rank)</text>
+
+    <!-- Result -->
+    <rect x="396" y="162" width="132" height="28" rx="6" fill="#1a2744"/>
+    <text x="462" y="179" font-size="9" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Consolidated risk report</text>
+
+    <!-- Key difference -->
+    <rect x="580" y="90" width="94" height="54" rx="6" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1"/>
+    <text x="627" y="107" font-size="8" font-weight="700" fill="#4c1d95" text-anchor="middle" font-family="Segoe UI,sans-serif">Key diff:</text>
+    <text x="627" y="120" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Map output is</text>
+    <text x="627" y="132" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">natural language,</text>
+    <text x="627" y="144" font-size="8" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">not key-value pairs</text>
+      </svg>
+      <p class="diagram-caption">Semantic Map-Reduce replaces deterministic aggregation functions with an LLM reduce step that can deduplicate, synthesise, and rank natural language outputs — enabling analysis tasks that have no deterministic equivalent.</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>6.5 &nbsp; Designing the Manager Agent</h2>
+    <p>The Manager Agent's sole job is decomposition and delegation. It receives a complex task, identifies the independent sub-tasks, constructs the appropriate instruction for each sub-agent, and dispatches them. The Manager should not attempt to do the analysis itself — this adheres to the Single Responsibility Principle (Chapter 9).</p>
+
+    <hr class="section-divider">
+
+    <h2>6.6 &nbsp; The Consensus Problem: When Agents Disagree</h2>
+    <p>When two or more sub-agents, given the same or equivalent inputs, produce different answers — this is <strong>divergent output</strong>. Unlike a traditional <code>for</code> loop (identical function calls always return identical values for identical inputs), parallel agents may reach different conclusions about the same document.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 6.3 — The Divergent Output Problem</div>
+      <svg width="680" height="200" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Same prompt to 3 agents -->
+    <rect x="260" y="12" width="160" height="40" rx="8" fill="#1a2744"/>
+    <text x="340" y="30" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Same Prompt</text>
+    <text x="340" y="44" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">"Summarise the risks"</text>
+
+    <!-- Lines to 3 agents -->
+    <line x1="290" y1="52" x2="120" y2="82" stroke="#6b7280" stroke-width="1.5"/>
+    <line x1="340" y1="52" x2="340" y2="82" stroke="#6b7280" stroke-width="1.5"/>
+    <line x1="390" y1="52" x2="560" y2="82" stroke="#6b7280" stroke-width="1.5"/>
+
+    <rect x="20" y="82" width="200" height="60" rx="8" fill="#7c3aed"/>
+    <text x="120" y="102" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Agent A output</text>
+    <text x="120" y="116" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">"3 key risks: liquidity,</text>
+    <text x="120" y="129" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">credit, ops"</text>
+
+    <rect x="240" y="82" width="200" height="60" rx="8" fill="#7c3aed"/>
+    <text x="340" y="102" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Agent B output</text>
+    <text x="340" y="116" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">"Primary risk: regulatory</text>
+    <text x="340" y="129" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">exposure in APAC"</text>
+
+    <rect x="460" y="82" width="200" height="60" rx="8" fill="#7c3aed"/>
+    <text x="560" y="102" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Agent C output</text>
+    <text x="560" y="116" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">"No significant risks</text>
+    <text x="560" y="129" font-size="9" fill="#e9d5ff" text-anchor="middle" font-family="Segoe UI,sans-serif">identified"</text>
+
+    <!-- Problem annotation -->
+    <rect x="20" y="154" width="640" height="40" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+    <text x="340" y="170" font-size="10" font-weight="700" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">⚠ Divergent ≠ incorrect — divergence is the expected behavior of a probabilistic system</text>
+    <text x="340" y="186" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Fix: structured output schema forces agents onto commensurable answer spaces that an aggregator can reconcile</text>
+      </svg>
+      <p class="diagram-caption">Three agents given the same prompt produce structurally different answers — not because any is wrong, but because the task under-specified the output format. The solution is a schema contract, not a prompt tweak.</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>6.7 &nbsp; Designing for Parallelism: The Independence Criterion</h2>
+    <p>The prerequisite for the parallel sub-agent pattern is <strong>independence</strong>: sub-agent A must be able to complete its work without requiring any output from sub-agent B.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 6.4 — Independence Check: Can These Tasks Run in Parallel?</div>
+      <svg width="680" height="180" viewBox="0 0 680 180" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Decision table -->
+    <!-- Header -->
+    <rect x="20" y="14" width="640" height="30" rx="6" fill="#1a2744"/>
+    <text x="200" y="34" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Dependency Type</text>
+    <text x="420" y="34" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Can Parallelize?</text>
+    <text x="580" y="34" font-size="10" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Strategy</text>
+
+    <!-- Row 1 -->
+    <rect x="20" y="44" width="640" height="28" rx="0" fill="#dcfce7"/>
+    <text x="200" y="62" font-size="10" fill="#14532d" text-anchor="middle" font-family="Segoe UI,sans-serif">No shared data, no ordering constraint</text>
+    <text x="420" y="62" font-size="11" font-weight="700" fill="#16a34a" text-anchor="middle" font-family="Segoe UI,sans-serif">✓ Yes — fully parallel</text>
+    <text x="565" y="62" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Standard fan-out</text>
+
+    <!-- Row 2 -->
+    <rect x="20" y="72" width="640" height="28" rx="0" fill="#fef3c7"/>
+    <text x="200" y="90" font-size="10" fill="#78350f" text-anchor="middle" font-family="Segoe UI,sans-serif">Read same data, write different keys</text>
+    <text x="420" y="90" font-size="11" font-weight="700" fill="#d97706" text-anchor="middle" font-family="Segoe UI,sans-serif">⚡ Mostly — with locking</text>
+    <text x="565" y="90" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Read-only snapshot at start</text>
+
+    <!-- Row 3 -->
+    <rect x="20" y="100" width="640" height="28" rx="0" fill="#fee2e2"/>
+    <text x="200" y="118" font-size="10" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">Task B needs Task A's output</text>
+    <text x="420" y="118" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle" font-family="Segoe UI,sans-serif">✗ No — sequential only</text>
+    <text x="565" y="118" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Pipeline, not parallel</text>
+
+    <!-- Row 4 -->
+    <rect x="20" y="128" width="640" height="28" rx="0,0,6,6" fill="#fee2e2"/>
+    <text x="200" y="146" font-size="10" fill="#991b1b" text-anchor="middle" font-family="Segoe UI,sans-serif">Both write the same shared state</text>
+    <text x="420" y="146" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle" font-family="Segoe UI,sans-serif">✗ No — race condition</text>
+    <text x="565" y="146" font-size="9" fill="#374151" text-anchor="middle" font-family="Segoe UI,sans-serif">Serialise or partition state</text>
+
+    <text x="340" y="172" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">Rule: model the dependency graph before choosing fan-out. Wrong parallelism produces non-deterministic errors, not performance.</text>
+      </svg>
+      <p class="diagram-caption">Parallelism is only valid when tasks are independent. The dependency graph determines the architecture — not the other way around.</p>
+    </div>
+
+    <p>The practical design rule: <strong>decompose tasks into the largest possible units of independence</strong>. Run all independent tasks in parallel, then synthesize at the natural aggregation boundaries.</p>
+
+    <hr class="section-divider">
+
+    <h2>6.8 &nbsp; When NOT to Parallelize</h2>
+    <p><strong>Sequential dependencies:</strong> When task B depends on the output of task A, parallelism is structurally impossible. <strong>Shared mutable state:</strong> Two agents writing conflicting updates to a shared scratchpad is just as problematic as two threads modifying shared memory without locks. <strong>Cost amplification:</strong> 50 sub-agents each consuming 2,000 input tokens is 100,000 input tokens — potentially orders of magnitude more expensive than a single sequential pass. <strong>Latency does not always improve:</strong> API rate limits can negate parallelism benefits entirely.</p>
+
+    <hr class="section-divider">
+
+    <h2>6.9 &nbsp; Chapter Summary</h2>
+    <p>The <code>for</code> loop iterates. Parallel sub-agents delegate. Use parallel sub-agents when inputs are heterogeneous and require adaptive handling. Apply the Semantic Map-Reduce pattern: parallel reasoning (map) followed by intelligent synthesis (reduce). Design the Synthesizer to handle divergent outputs explicitly. Apply parallelism only where tasks are genuinely independent.</p>
+
+    <div class="core-principle">
+      <div class="core-principle-label">Core Principle — Chapter 6</div>
+      <p>A <code>for</code> loop applies the same logic repeatedly. Parallel sub-agents apply judgment repeatedly. <strong>This is the difference between automation and delegation. The programmer who masters this becomes an architect of reasoning at scale.</strong></p>
+    </div>
+
+  </div><!-- /.prose -->
+
+  <nav class="bottom-nav">
+    <a href="ch05.html">
+      <span class="nav-direction">← Previous</span>
+      <span class="nav-title">Chapter 5 — Semantic Routing</span>
+    </a>
+    <a href="ch07.html" class="next">
+      <span class="nav-direction">Next →</span>
+      <span class="nav-title">Chapter 7 — The Agentic Loop</span>
+    </a>
+  </nav>
+
+</div><!-- /.page-wrap -->
+
+<footer class="site-copyright">&copy; 2026 Nguyen Ngo &middot; The Agentic Programming Language</footer>
+</body>
+</html>

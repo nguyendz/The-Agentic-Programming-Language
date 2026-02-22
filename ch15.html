@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 15 — Observability: Tracing Agent Reasoning | The Agentic Programming Language</title>
+<link rel="stylesheet" href="reading.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="book-title">The Agentic Programming Language</a>
+  <div class="chapter-nav">
+    <a href="ch14.html">← Previous</a>
+    <a href="ch16.html">Next →</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <header class="chapter-header">
+    <div class="chapter-label">Chapter 15</div>
+    <h1 class="chapter-title">Observability: Tracing Agent Reasoning</h1>
+    <p class="chapter-subtitle">You Cannot Debug What You Cannot See</p>
+    <div class="chapter-meta">
+      <span>Part VI — The New Security and Observability</span>
+      <span>6 sections</span>
+    </div>
+  </header>
+
+  <div class="prose">
+
+    <p>In traditional software, observability is about metrics, logs, and traces. You instrument the code, collect the data, and visualize what is happening inside a running system. This discipline is mature and well-understood. For agentic systems, the same discipline applies — but the thing you are observing is fundamentally different: you are observing <em>reasoning</em>. The agent's decision-making process, its tool call choices, its confidence, its interpretation of the system prompt. Observing that requires new instrumentation at the semantic level.</p>
+
+    <hr class="section-divider">
+
+    <h2>15.1 &nbsp; Why Agents Are Hard to Observe</h2>
+    <p>A traditional microservice either returns a 200 or a 500. You can trace the call stack. You can replay the exact request. Agent behavior has none of that determinism. The same input may produce different outputs on different runs. The "bug" may not be an exception — it may be subtle semantic drift: the agent technically answered the question, but the answer is slightly wrong, slightly off-tone, slightly too verbose. That kind of degradation is invisible without semantic observability tooling.</p>
+    <p>Multi-agent systems compound the difficulty. If a five-agent pipeline produces a wrong final output, which agent is responsible? Without distributed tracing that links all agents by a shared <code>trace_id</code>, you cannot answer that question.</p>
+
+    <hr class="section-divider">
+
+    <h2>15.2 &nbsp; Four Observability Layers</h2>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 15.1 — Four-Layer Agent Observability Stack</div>
+      <svg width="680" height="310" viewBox="0 0 680 310" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Layer 4: Infra (bottom) -->
+    <rect x="40" y="254" width="600" height="48" rx="8" fill="#374151"/>
+    <text x="340" y="275" font-size="11" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Layer 1 — Infrastructure Metrics</text>
+    <text x="340" y="291" font-size="9" fill="#9ca3af" text-anchor="middle" font-family="Segoe UI,sans-serif">Latency per call  |  Token usage / cost  |  API error rates  |  Model availability</text>
+
+    <!-- Layer 3: Tool calls -->
+    <rect x="60" y="196" width="560" height="52" rx="8" fill="#1a2744"/>
+    <text x="340" y="218" font-size="11" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Layer 2 — Tool &amp; Retrieval Observability</text>
+    <text x="340" y="234" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Tool call success / failure rate  |  Retrieved chunk relevance score  |  Tool selection distribution</text>
+    <text x="340" y="247" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">Retrieval recall @k  |  Tool latency histogram</text>
+
+    <!-- Layer 2: Agent behaviour -->
+    <rect x="80" y="126" width="520" height="64" rx="8" fill="#2563eb"/>
+    <text x="340" y="150" font-size="11" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Layer 3 — Agent Behaviour Metrics</text>
+    <text x="340" y="167" font-size="9" fill="#bfdbfe" text-anchor="middle" font-family="Segoe UI,sans-serif">Loop iteration count per task  |  Goal completion rate  |  Hallucination rate (eval-scored)</text>
+    <text x="340" y="181" font-size="9" fill="#93c5fd" text-anchor="middle" font-family="Segoe UI,sans-serif">Context window utilisation  |  Stop condition trigger distribution</text>
+
+    <!-- Layer 1: Business outcomes (top) -->
+    <rect x="100" y="50" width="480" height="70" rx="8" fill="#14532d"/>
+    <text x="340" y="74" font-size="11" font-weight="700" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">Layer 4 — Business Outcome Metrics</text>
+    <text x="340" y="92" font-size="9" fill="#86efac" text-anchor="middle" font-family="Segoe UI,sans-serif">Task success rate (eval-graded)  |  User satisfaction score  |  Time to acceptable output</text>
+    <text x="340" y="108" font-size="9" fill="#4ade80" text-anchor="middle" font-family="Segoe UI,sans-serif">False positive / negative rate on high-stakes decisions  |  Business KPI impact</text>
+
+    <!-- Labels on left side -->
+    <text x="22" y="90" font-size="8" fill="#14532d" text-anchor="middle" transform="rotate(-90,22,90)" font-family="Segoe UI,sans-serif">BUSINESS</text>
+    <text x="22" y="160" font-size="8" fill="#2563eb" text-anchor="middle" transform="rotate(-90,22,160)" font-family="Segoe UI,sans-serif">BEHAVIOUR</text>
+    <text x="22" y="225" font-size="8" fill="#6b7280" text-anchor="middle" transform="rotate(-90,22,225)" font-family="Segoe UI,sans-serif">TOOLS</text>
+    <text x="22" y="280" font-size="8" fill="#9ca3af" text-anchor="middle" transform="rotate(-90,22,280)" font-family="Segoe UI,sans-serif">INFRA</text>
+
+    <!-- Drilldown note -->
+    <text x="340" y="18" font-size="9" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">Alert at Layer 4 → diagnose in Layer 3 → isolate in Layer 2 → trace to Layer 1</text>
+  </svg>
+      <p class="diagram-caption">The four-layer stack separates what the business cares about (Layer 4) from what the infrastructure measures (Layer 1). Alerts trigger at the business layer; root-cause analysis drills downward through each layer.</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>15.3 &nbsp; Implementing Reasoning Traces</h2>
+    <p>The reasoning trace is the most valuable and most unique layer of agentic observability. It captures not just <em>what</em> the agent said, but <em>why</em> it made specific choices. This requires explicit prompt instrumentation: instruct the agent to output its reasoning in a structured format that can be extracted and stored separately from the user-facing response.</p>
+
+    <h3>Chain-of-Thought Logging</h3>
+    <div class="code-label">System Prompt with Structured Trace Output</div>
+    <pre><code>SYSTEM_PROMPT_WITH_TRACE = """
+You are a customer service agent. Before responding, reason through 
+the problem. Structure your complete output as:
+
+&lt;reasoning&gt;
+1. What is the customer asking? (classify intent)
+2. What information do I need from tools?
+3. What are the constraints from the system prompt?
+4. What is the appropriate response format?
+&lt;/reasoning&gt;
+&lt;output&gt;
+[Your response to the customer here]
+&lt;/output&gt;
+"""
+
+def extract_reasoning_trace(full_response: str) -> tuple[str, str]:
+    """Separates reasoning from user-facing output."""
+    reasoning_match = re.search(r'&lt;reasoning&gt;(.*?)&lt;/reasoning&gt;',
+                                full_response, re.DOTALL)
+    output_match    = re.search(r'&lt;output&gt;(.*?)&lt;/output&gt;',
+                                full_response, re.DOTALL)
+    reasoning = reasoning_match.group(1).strip() if reasoning_match else ""
+    output    = output_match.group(1).strip()    if output_match    else full_response
+    return reasoning, output</code></pre>
+
+    <h3>Tool Call Tracing</h3>
+    <p>Every tool invocation should be logged with the full input, the full output, the latency, and the trace ID. A <code>TracedToolWrapper</code> decorates each tool with automatic logging, without changing the tool's implementation.</p>
+    <div class="code-label">TracedToolWrapper</div>
+    <pre><code>class TracedToolWrapper:
+    def __init__(self, tool_fn, trace_store: TraceStore):
+        self.tool_fn     = tool_fn
+        self.trace_store = trace_store
+    
+    async def __call__(self, trace_id: str, **kwargs) -> Any:
+        start_time = time.time()
+        result     = await self.tool_fn(**kwargs)
+        latency_ms = (time.time() - start_time) * 1000
+
+        self.trace_store.log_tool_call({
+            "trace_id":  trace_id,
+            "tool":      self.tool_fn.__name__,
+            "input":     kwargs,
+            "output":    result,
+            "latency_ms":latency_ms,
+            "timestamp": datetime.utcnow().isoformat(),
+        })
+        return result</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>15.4 &nbsp; Semantic Drift Detection</h2>
+    <p>Semantic drift is the gradual degradation of agent behavior over time — often invisible in individual interactions but detectable in aggregate. Causes: model provider updates to the underlying model version; incremental system prompt edits that collectively shift behavior; distribution shift in user queries (the real-world traffic diverges from the golden dataset). The fix is a continuous evaluation loop that runs the golden dataset against the production agent on a schedule and alerts when pass rates decline.</p>
+
+    <div class="code-label">Online Evaluation with Drift Alert</div>
+    <pre><code">async def run_online_eval_sample(
+    agent, sample_size: int = 50
+) -> EvalReport:
+    """Randomly samples from golden dataset and runs online evaluation."""
+    sample   = random.sample(GOLDEN_DATASET, sample_size)
+    results  = await run_eval_suite(agent, sample)
+    
+    report = EvalReport(
+        timestamp    = datetime.utcnow(),
+        pass_rate    = results.pass_count / sample_size,
+        failed_cases = results.failed_cases,
+    )
+    
+    # Alert if rolling pass rate drops more than 5% from baseline
+    rolling_rate = compute_rolling_pass_rate(window_days=7)
+    if rolling_rate < BASELINE_PASS_RATE - 0.05:
+        alert.send(
+            severity = "HIGH",
+            message  = f"Agent pass rate drifted: {rolling_rate:.1%} "
+                       f"(baseline: {BASELINE_PASS_RATE:.1%})"
+        )
+    return report</code></pre>
+
+    <hr class="section-divider">
+
+    <h2>15.5 &nbsp; Agent Audit Trail</h2>
+    <p>For production agentic systems, especially those taking real-world actions, a complete audit trail is not optional — it is a compliance requirement. Every inference that leads to a real-world action must be traceable: who asked it, what the agent was told, what it reasoned, what it called, and what it returned.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Audit Field</th><th>Description</th><th>Security Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>run_id</code></td><td>Unique identifier for this agent invocation</td><td>Links all events in one run</td></tr>
+          <tr><td><code>trace_id</code></td><td>Shared ID across all agents in a multi-agent workflow</td><td>Traces causality across agents</td></tr>
+          <tr><td><code>timestamp</code></td><td>UTC timestamp of the invocation</td><td>Enables time-based correlation</td></tr>
+          <tr><td><code>user_id</code></td><td>Authenticated user who triggered the invocation</td><td>Attribution for all actions</td></tr>
+          <tr><td><code>intent</code></td><td>Classified intent (from semantic router)</td><td>Audit trail for routing decisions</td></tr>
+          <tr><td><code>prompt_version</code></td><td>System prompt version identifier</td><td>Correlates behavior with specific prompts</td></tr>
+          <tr><td><code>model</code></td><td>Model name + version used</td><td>Correlates behavior with model versions</td></tr>
+          <tr><td><code>tool_calls</code></td><td>Full list of tool calls with inputs and outputs</td><td>Post-hoc detection of injection attacks</td></tr>
+          <tr><td><code>reasoning_trace</code></td><td>Extracted chain-of-thought reasoning</td><td>Root cause analysis for wrong output</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>15.6 &nbsp; Distributed Tracing in Multi-Agent Workflows</h2>
+
+    <div class="diagram">
+      <div class="diagram-label">Fig 15.2 — Distributed Trace: Multi-Agent Workflow</div>
+      <svg width="680" height="240" viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Trace ID header -->
+    <rect x="20" y="10" width="640" height="22" rx="4" fill="#1a2744"/>
+    <text x="30" y="25" font-size="9" fill="#93c5fd" font-family="Cascadia Code,Consolas,monospace">trace_id: abc123  |  request_id: req456  |  user: bap@co  |  started: 09:42:11.234</text>
+
+    <!-- Orchestrator span -->
+    <rect x="20" y="40" width="640" height="24" rx="4" fill="#374151"/>
+    <text x="30" y="56" font-size="9" font-weight="700" fill="white" font-family="Cascadia Code,Consolas,monospace">span[orchestrator]  duration=4821ms  model=gpt-4o  tokens=1240</text>
+    <rect x="460" y="44" width="192" height="16" rx="2" fill="#2563eb" opacity="0.5"/>
+    <text x="556" y="55" font-size="7" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">4821ms</text>
+
+    <!-- Child span: Retrieval -->
+    <rect x="40" y="72" width="580" height="22" rx="4" fill="#1a2744" opacity="0.8"/>
+    <text x="50" y="87" font-size="9" fill="#93c5fd" font-family="Cascadia Code,Consolas,monospace">  span[rag.retrieve]  duration=312ms  query="Q3 risk"  chunks_returned=8  top_score=0.91</text>
+    <rect x="460" y="76" width="24" height="14" rx="2" fill="#7c3aed" opacity="0.7"/>
+
+    <!-- Child span: Tool call 1 -->
+    <rect x="40" y="100" width="580" height="22" rx="4" fill="#1a2744" opacity="0.8"/>
+    <text x="50" y="115" font-size="9" fill="#86efac" font-family="Cascadia Code,Consolas,monospace">  span[tool.sql_query]  duration=88ms  rows=142  status=OK</text>
+    <rect x="486" y="104" width="8" height="14" rx="2" fill="#16a34a" opacity="0.8"/>
+
+    <!-- Child span: Sub-agent A -->
+    <rect x="40" y="128" width="580" height="22" rx="4" fill="#1a2744" opacity="0.8"/>
+    <text x="50" y="143" font-size="9" fill="#fde68a" font-family="Cascadia Code,Consolas,monospace">  span[agent.analysis]  duration=2100ms  model=claude-3  tokens=3400  loops=3</text>
+    <rect x="460" y="132" width="162" height="14" rx="2" fill="#d97706" opacity="0.5"/>
+    <text x="541" y="142" font-size="7" fill="white" text-anchor="middle" font-family="Segoe UI,sans-serif">2100ms</text>
+
+    <!-- Nested child span inside sub-agent -->
+    <rect x="60" y="156" width="540" height="22" rx="4" fill="#1a2744" opacity="0.6"/>
+    <text x="70" y="171" font-size="9" fill="#fca5a5" font-family="Cascadia Code,Consolas,monospace">    span[reflexion.retry]  attempt=2  prev_score=2.8  reason="missing APAC breakdown"</text>
+
+    <!-- Child span: Formatter -->
+    <rect x="40" y="184" width="580" height="22" rx="4" fill="#1a2744" opacity="0.8"/>
+    <text x="50" y="199" font-size="9" fill="#c4b5fd" font-family="Cascadia Code,Consolas,monospace">  span[agent.format]  duration=321ms  output_tokens=620  format=pdf_ready</text>
+    <rect x="618" y="188" width="24" height="14" rx="2" fill="#7c3aed" opacity="0.6"/>
+
+    <!-- Total result -->
+    <rect x="20" y="212" width="640" height="24" rx="4" fill="#14532d"/>
+    <text x="30" y="228" font-size="9" fill="#86efac" font-family="Cascadia Code,Consolas,monospace">trace completed  |  status=SUCCESS  |  total_tokens=5262  |  total_cost=$0.034  |  eval_score=4.2/5</text>
+
+    <!-- Legend -->
+    <text x="340" y="248" font-size="8" fill="#6b7280" text-anchor="middle" font-family="Segoe UI,sans-serif">Each span is emitted by instrumented agent code — enabling replay, cost attribution, and per-span latency analysis</text>
+  </svg>
+      <p class="diagram-caption">A distributed trace gives each agent call, tool invocation, and retrieval step its own span with timing, token count, and outcome. The full trace reconstructs exactly what happened, in what order, and at what cost.</p>
+    </div>
+
+    <div class="core-principle">
+      <div class="core-principle-label">Core Principle — Chapter 15</div>
+      <p>You cannot debug what you cannot see. <strong>Observability is not a luxury — it is the prerequisite for production-grade agentic systems.</strong> Instrument reasoning traces from day one, before you need to debug a failure in production.</p>
+    </div>
+
+  </div><!-- /.prose -->
+
+  <nav class="bottom-nav">
+    <a href="ch14.html">
+      <span class="nav-direction">← Previous</span>
+      <span class="nav-title">Chapter 14 — Prompt Injection</span>
+    </a>
+    <a href="ch16.html" class="next">
+      <span class="nav-direction">Next →</span>
+      <span class="nav-title">Chapter 16 — Turing Complete</span>
+    </a>
+  </nav>
+
+</div><!-- /.page-wrap -->
+
+<footer class="site-copyright">&copy; 2026 Nguyen Ngo &middot; The Agentic Programming Language</footer>
+</body>
+</html>

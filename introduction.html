@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction | The Agentic Programming Language</title>
+<link rel="stylesheet" href="reading.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="book-title">The Agentic Programming Language</a>
+  <div class="chapter-nav">
+    <a href="index.html">← Contents</a>
+    <a href="ch01.html">Next →</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <header class="chapter-header">
+    <div class="chapter-label">Introduction</div>
+    <h1 class="chapter-title">A Translation Guide</h1>
+    <p class="chapter-subtitle">For Software Engineers Entering the Agentic Paradigm</p>
+    <div class="chapter-meta">
+      <span>6 sections</span>
+    </div>
+  </header>
+
+  <div class="credits-block">
+    <div class="credits-block-title">Credits</div>
+    <p style="font-size:0.8rem;color:var(--ink-light);margin:0 0 0.75rem;font-style:italic;">This book is compiled from a set of prompts.</p>
+    <div class="credits-grid">
+      <span class="credits-role">Editor in Chief</span>     <span class="credits-name">Nguyen Ngo</span>
+      <span class="credits-role">Topic &amp; Main Concept</span> <span class="credits-name">Nguyen Ngo</span>
+      <span class="credits-role">Elaboration</span>           <span class="credits-name">Gemini</span>
+      <span class="credits-role">Review</span>                <span class="credits-name">Sonnet acting as Architect</span>
+      <span class="credits-role">Illustration &amp; Presentation</span> <span class="credits-name">Sonnet acting as Designer</span>
+    </div>
+  </div>
+
+  <div class="prose">
+
+    <h2>Who This Book Is For</h2>
+    <p>This book is written for working software engineers — people who already know how to program, who have written functions and classes, who understand what a loop invariant is and why SQL injection is dangerous. It is not an introduction to programming, and it is not a survey of AI tools.</p>
+    <p>It is a translation guide.</p>
+    <p>Large language models, autonomous agents, and tool-calling pipelines are not replacing software engineering. They are extending it into a new execution medium — one where the program is a natural language prompt, the compiler is a neural network, and the runtime is a probabilistic inference engine rather than a deterministic interpreter. The skills you have built over years of software development are directly applicable to this medium. But the mapping is not obvious, the new failure modes are unfamiliar, and the tooling is still young.</p>
+    <p>This book makes the mapping explicit. For every major concept in classical software engineering — control flow, memory management, architecture, testing, security, debugging — it identifies the equivalent structure in the agentic paradigm, examines where the analogy holds precisely and where it breaks down, and gives you the practical framework for building reliable systems in the new medium.</p>
+    <p>If you have shipped production code, you will find this book moves quickly. That is intentional. You are not learning to think like an engineer; you are learning to apply engineering thinking to a new domain.</p>
+
+    <hr class="section-divider">
+
+    <h2>The Central Argument</h2>
+    <p>This book rests on three axioms:</p>
+    <p><strong>1. The Prompt is the new Programming Language.</strong> A system prompt is source code. It has structure, it defines behavior, it must be maintained, versioned, and tested. The discipline of writing prompts well is the same discipline as writing code well — clarity, specificity, separation of concerns.</p>
+    <p><strong>2. The LLM is the new Compiler.</strong> A large language model translates natural language instructions into behavior. It is not infallible, but it is not the source of most failures either. Just as a compiler rarely has bugs, the LLM rarely is to blame when an agent misbehaves. The fault is usually in the program — the prompt.</p>
+    <p><strong>3. Context, files, and databases are the new Data Layer.</strong> Agentic systems do not execute against static inputs. They retrieve, embed, inject, and reason over dynamic data drawn from documents, databases, and API responses. The design of this data layer — what to retrieve, when, at what granularity — is the agentic equivalent of database design.</p>
+    <p>Everything in this book follows from these three axioms.</p>
+
+    <hr class="section-divider">
+
+    <h2>What You Will Learn</h2>
+    <p><strong>Part I — The New Syntax</strong> establishes the fundamental mapping between traditional programming languages and the prompt. Chapter 1 traces the seventy-year history of programming language abstraction that led here. Chapter 2 introduces the Fundamental Trilogy in detail, along with the diagnostic framework it provides: when an agentic system fails, the fault is in one of exactly three places.</p>
+    <p><strong>Part II — The New Memory</strong> examines the context window — the agent's working memory — as an engineering resource to be managed deliberately. Chapter 3 covers the structure, limits, and allocation strategy of the context window. Chapter 4 addresses context rot: the gradual, silent degradation of agent behavior that accumulates in long-running sessions, and the garbage collection strategies that prevent it.</p>
+    <p><strong>Part III — The New Control Flow</strong> maps the three fundamental control flow primitives to their agentic equivalents. <code>if/then</code> → Semantic Router (Chapter 5). <code>for</code> loop → Parallel Sub-Agents (Chapter 6). <code>while</code> loop → The Agentic Loop (Chapter 7). Each chapter examines where the classical abstraction fails for natural language inputs and how the agentic equivalent compensates.</p>
+    <p><strong>Part IV — The New Architecture</strong> covers the structural patterns that determine whether an agentic system scales, stays maintainable, and survives contact with changing requirements. Chapter 8 applies Dependency Injection to agent systems. Chapters 9 and 10 apply the SOLID principles and classical design patterns to multi-agent workflows.</p>
+    <p><strong>Part V — The New Engineering Practices</strong> covers the testing and debugging disciplines that make agentic systems reliable enough to deploy. Chapter 11 introduces Eval-Driven Development — the agentic equivalent of TDD. Chapter 12 maps Behavior-Driven Development's Given/When/Then structure onto system prompt design. Chapter 13 establishes a systematic debugging process grounded in the principle that the model is the compiler: when something is wrong, look at the prompt first.</p>
+    <p><strong>Part VI — The New Security and Observability</strong> covers the attack surfaces and instrumentation requirements unique to agentic systems. Chapter 14 treats prompt injection with the same structural seriousness as SQL injection — because structurally, it is the same problem. Chapter 15 covers the four-layer observability stack required to trace agent reasoning in production.</p>
+    <p><strong>Part VII — The Future</strong> steps back from the operational to the theoretical. Chapter 16 proves that the agentic programming paradigm is Turing Complete, then examines what that result means practically. Chapter 17 describes the role of the programmer in this paradigm — the Orchestrator of Talents — and closes with the complete Rosetta Stone reference mapping every classical software concept to its agentic equivalent.</p>
+
+    <hr class="section-divider">
+
+    <h2>How to Use This Book</h2>
+    <p>Chapters are designed to be read sequentially. Each chapter builds on concepts introduced in prior chapters, and the cross-references are intentional. If you are already comfortable with a particular classical concept (say, Dependency Injection), the corresponding chapter will be short — it maps a familiar idea onto a new medium rather than teaching the idea from scratch.</p>
+    <p>The <strong>Code Examples</strong> use Python, JSON, and SQL as needed. They are illustrative, not production-ready. Variable names and structures are chosen for clarity, not performance. Where a code example shows a prompt, it is formatted as a string literal or a structured block to make the prompt-as-code analogy explicit.</p>
+    <p>The <strong>Core Principle</strong> at the end of each chapter is a single, precise statement of the chapter's central claim. If you read only the Core Principles, you will have a compressed overview of the book. If you read the chapters, you will have the framework to build on them.</p>
+
+    <hr class="section-divider">
+
+    <h2>A Note on Terminology</h2>
+    <p>The field is young and terminology is not yet standardized. Terms like "agent," "pipeline," "orchestrator," "tool," "eval," and "RAG" are used in overlapping and sometimes contradictory ways across the literature and across tooling frameworks.</p>
+    <p>This book uses the following definitions consistently:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Term</th><th>Definition used in this book</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Agent</strong></td>
+            <td>A configured LLM invocation — a (system prompt, model, tools) triple — that executes a task and returns a result. An agent may be simple (a single LLM call) or complex (a multi-turn ReAct loop).</td>
+          </tr>
+          <tr>
+            <td><strong>Orchestrator</strong></td>
+            <td>A component that sequences, routes, and coordinates multiple agents toward a composite goal.</td>
+          </tr>
+          <tr>
+            <td><strong>Tool</strong></td>
+            <td>A callable external function (API, database query, code executor) that an agent can invoke to perform actions or retrieve information.</td>
+          </tr>
+          <tr>
+            <td><strong>Eval</strong></td>
+            <td>A structured test case for an agent, consisting of an input, an expected behavior specification, and an evaluation function.</td>
+          </tr>
+          <tr>
+            <td><strong>Context</strong></td>
+            <td>The complete token sequence provided to a model in a single inference call — system prompt, retrieved documents, conversation history, and tool outputs combined.</td>
+          </tr>
+          <tr>
+            <td><strong>RAG</strong></td>
+            <td>Retrieval-Augmented Generation: the practice of retrieving relevant documents or data at inference time and injecting them into the context before the agent reasons.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>When the book deviates from these definitions for a specific technical point, the deviation is noted explicitly.</p>
+
+    <hr class="section-divider">
+
+    <h2>The Rosetta Stone</h2>
+    <p>The title of the series is <em>The Agentic Programming Language.</em> The subtitle is <em>A Programmer's Guide to the New Paradigm.</em> The organizing metaphor throughout — the Rosetta Stone — refers to the systematic mapping between two languages that express the same computational ideas in different media.</p>
+    <p>The original Rosetta Stone made ancient Egyptian hieroglyphics legible by providing the same text in three scripts. This book makes agentic programming legible to software engineers by providing every concept in both scripts: the classical programming formulation and the agentic equivalent.</p>
+    <p>The complete Rosetta Stone is assembled incrementally across the book, with each chapter contributing its section of the mapping. The full reference table is consolidated in the Appendix of Chapter 17.</p>
+
+    <div class="core-principle">
+      <div class="core-principle-label">Opening Axiom</div>
+      <p>For seventy years, programmers told computers <em>how</em> to do things. Now, for the first time, we tell them <em>what</em> we want — and they determine the how. <strong>Everything this book covers is a consequence of that single shift.</strong></p>
+    </div>
+
+  </div><!-- /.prose -->
+
+  <nav class="bottom-nav">
+    <a href="index.html">
+      <span class="nav-direction">← Contents</span>
+      <span class="nav-title">Table of Contents</span>
+    </a>
+    <a href="ch01.html" class="next">
+      <span class="nav-direction">Next →</span>
+      <span class="nav-title">Chapter 1 — The Language Shift</span>
+    </a>
+  </nav>
+
+</div><!-- /.page-wrap -->
+
+<footer class="site-copyright">&copy; 2026 Nguyen Ngo &middot; The Agentic Programming Language</footer>
+</body>
+</html>
