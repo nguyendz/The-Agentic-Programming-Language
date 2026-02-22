@@ -101,6 +101,17 @@
   line-height: 1.3;
   margin-bottom: 0.18rem;
 }
+.ch-title a {
+  color: inherit;
+  text-decoration: none;
+}
+.ch-title a:hover { text-decoration: underline; }
+.ch-abstract {
+  font-size: 0.82rem;
+  color: var(--ink-light);
+  line-height: 1.5;
+  margin: 0.2rem 0 0;
+}
 .ch-subtitle {
   font-size: 0.82rem;
   color: var(--ink-light);
@@ -210,11 +221,9 @@
     <div class="chapter-row" style="border-bottom:1px solid var(--border)">
       <div class="ch-num">Intro</div>
       <div class="ch-body">
-        <div class="ch-title">Introduction</div>
+        <div class="ch-title"><a href="introduction.html">Introduction</a></div>
         <div class="ch-subtitle">A Translation Guide for Software Engineers Entering the Agentic Paradigm</div>
-        <div class="ch-links">
-          <a href="introduction.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Maps classical software engineering concepts to their agentic equivalents, giving developers a mental framework to cross the paradigm boundary without losing their footing.</p>
       </div>
       <div class="ch-meta">6 sections</div>
     </div>
@@ -230,11 +239,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 1</div>
       <div class="ch-body">
-        <div class="ch-title">The Language Shift</div>
+        <div class="ch-title"><a href="ch01.html">The Language Shift</a></div>
         <div class="ch-subtitle">When Natural Language Became Code</div>
-        <div class="ch-links">
-          <a href="ch01.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Traces the moment natural language crossed from documentation into executable code, and what that shift demands from programmers who learned to think in types and functions.</p>
       </div>
       <div class="ch-meta">7 sections</div>
     </div>
@@ -242,11 +249,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 2</div>
       <div class="ch-body">
-        <div class="ch-title">The Fundamental Trilogy</div>
+        <div class="ch-title"><a href="ch02.html">The Fundamental Trilogy</a></div>
         <div class="ch-subtitle">Model, Prompt, and Context as a Complete System</div>
-        <div class="ch-links">
-          <a href="ch02.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Explores model, prompt, and context as an inseparable system — change any one element and the behavior of the whole changes with it.</p>
       </div>
       <div class="ch-meta">7 sections</div>
     </div>
@@ -262,11 +267,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 3</div>
       <div class="ch-body">
-        <div class="ch-title">The Context Window</div>
+        <div class="ch-title"><a href="ch03.html">The Context Window</a></div>
         <div class="ch-subtitle">RAM, Attention, and the Token Budget</div>
-        <div class="ch-links">
-          <a href="ch03.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Treats the context window as working memory: finite, precious, and the primary resource an agentic programmer must learn to allocate deliberately.</p>
       </div>
       <div class="ch-meta">7 sections</div>
     </div>
@@ -274,11 +277,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 4</div>
       <div class="ch-body">
-        <div class="ch-title">Context Rot</div>
+        <div class="ch-title"><a href="ch04.html">Context Rot</a></div>
         <div class="ch-subtitle">When Memory Becomes Noise</div>
-        <div class="ch-links">
-          <a href="ch04.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Diagnoses the slow degradation of context quality — how stale history, contradictory instructions, and accumulated noise silently erode agent reliability over time.</p>
       </div>
       <div class="ch-meta">7 sections</div>
     </div>
@@ -294,11 +295,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 5</div>
       <div class="ch-body">
-        <div class="ch-title">Semantic Routing</div>
+        <div class="ch-title"><a href="ch05.html">Semantic Routing</a></div>
         <div class="ch-subtitle">The if/else That Understands Intent</div>
-        <div class="ch-links">
-          <a href="ch05.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Replaces hard-coded conditionals with meaning-aware routing that dispatches tasks based on intent, turning ambiguous natural-language input into deterministic execution paths.</p>
       </div>
       <div class="ch-meta">8 sections</div>
     </div>
@@ -306,11 +305,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 6</div>
       <div class="ch-body">
-        <div class="ch-title">Parallel Sub-Agents</div>
+        <div class="ch-title"><a href="ch06.html">Parallel Sub-Agents</a></div>
         <div class="ch-subtitle">The for Loop That Applies Judgment</div>
-        <div class="ch-links">
-          <a href="ch06.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Decomposes a task into concurrent workstreams where each sub-agent applies independent judgment, then synthesizes the results into a coherent whole.</p>
       </div>
       <div class="ch-meta">9 sections</div>
     </div>
@@ -318,11 +315,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 7</div>
       <div class="ch-body">
-        <div class="ch-title">The Agentic Loop</div>
+        <div class="ch-title"><a href="ch07.html">The Agentic Loop</a></div>
         <div class="ch-subtitle">The while Loop That Knows When to Stop</div>
-        <div class="ch-links">
-          <a href="ch07.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Dissects the plan–act–observe cycle that drives autonomous agents, and identifies the stopping conditions that separate reliable agents from runaway loops.</p>
       </div>
       <div class="ch-meta">7 sections</div>
     </div>
@@ -338,11 +333,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 8</div>
       <div class="ch-body">
-        <div class="ch-title">Dependency Injection for Agents</div>
+        <div class="ch-title"><a href="ch08.html">Dependency Injection for Agents</a></div>
         <div class="ch-subtitle">From God Prompt to Composable Architecture</div>
-        <div class="ch-links">
-          <a href="ch08.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Refactors the monolithic god-prompt into injected, composable components — separating persona, tools, memory, and task specification into clean, testable interfaces.</p>
       </div>
       <div class="ch-meta">7 sections</div>
     </div>
@@ -350,11 +343,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 9</div>
       <div class="ch-body">
-        <div class="ch-title">SOLID Principles for Agent Systems</div>
+        <div class="ch-title"><a href="ch09.html">SOLID Principles for Agent Systems</a></div>
         <div class="ch-subtitle">Why Fifty-Year-Old Rules Still Apply</div>
-        <div class="ch-links">
-          <a href="ch09.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Applies SRP, OCP, LSP, ISP, and DIP to agent system design, showing these fifty-year-old rules are more relevant, not less, when working at the semantic layer.</p>
       </div>
       <div class="ch-meta">8 sections</div>
     </div>
@@ -362,11 +353,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 10</div>
       <div class="ch-body">
-        <div class="ch-title">Design Patterns in Multi-Agent Workflows</div>
+        <div class="ch-title"><a href="ch10.html">Design Patterns in Multi-Agent Workflows</a></div>
         <div class="ch-subtitle">Gang of Four Meets the LLM Runtime</div>
-        <div class="ch-links">
-          <a href="ch10.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Translates Observer, Strategy, Chain-of-Responsibility, and other classic patterns into multi-agent workflow architectures — familiar structures in a new medium.</p>
       </div>
       <div class="ch-meta">7 sections</div>
     </div>
@@ -382,11 +371,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 11</div>
       <div class="ch-body">
-        <div class="ch-title">TDD for Agents</div>
+        <div class="ch-title"><a href="ch11.html">TDD for Agents</a></div>
         <div class="ch-subtitle">Eval-Driven Development and the New Test Suite</div>
-        <div class="ch-links">
-          <a href="ch11.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Adapts test-driven development to the probabilistic domain, writing evals before prompts to define what good output looks like before the first token is generated.</p>
       </div>
       <div class="ch-meta">5 sections</div>
     </div>
@@ -394,11 +381,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 12</div>
       <div class="ch-body">
-        <div class="ch-title">BDD for Agents</div>
+        <div class="ch-title"><a href="ch12.html">BDD for Agents</a></div>
         <div class="ch-subtitle">Behavior as the Contract, Scenarios as the Specification</div>
-        <div class="ch-links">
-          <a href="ch12.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Uses Gherkin-style Given/When/Then scenarios as executable agent specifications, making behavior testable, auditable, and readable by non-engineers.</p>
       </div>
       <div class="ch-meta">7 sections</div>
     </div>
@@ -406,11 +391,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 13</div>
       <div class="ch-body">
-        <div class="ch-title">The Debugging Mindset</div>
+        <div class="ch-title"><a href="ch13.html">The Debugging Mindset</a></div>
         <div class="ch-subtitle">Debug the Prompt, Not the Model</div>
-        <div class="ch-links">
-          <a href="ch13.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Reframes debugging for non-deterministic systems, tracing agent failures back to ambiguous instructions, missing context, and misaligned goals rather than code bugs.</p>
       </div>
       <div class="ch-meta">7 sections</div>
     </div>
@@ -426,11 +409,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 14</div>
       <div class="ch-body">
-        <div class="ch-title">Prompt Injection: The New SQL Injection</div>
+        <div class="ch-title"><a href="ch14.html">Prompt Injection: The New SQL Injection</a></div>
         <div class="ch-subtitle">Structural Separation Between Instructions and Data</div>
-        <div class="ch-links">
-          <a href="ch14.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Treats user-supplied data as an untrusted attack surface and builds structural barriers that prevent injected instructions from hijacking agent behavior.</p>
       </div>
       <div class="ch-meta">6 sections</div>
     </div>
@@ -438,11 +419,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 15</div>
       <div class="ch-body">
-        <div class="ch-title">Observability: Tracing Agent Reasoning</div>
+        <div class="ch-title"><a href="ch15.html">Observability: Tracing Agent Reasoning</a></div>
         <div class="ch-subtitle">You Cannot Debug What You Cannot See</div>
-        <div class="ch-links">
-          <a href="ch15.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Instruments agent systems with traces, spans, and structured logs so that reasoning chains become inspectable and failures become diagnosable before they reach production.</p>
       </div>
       <div class="ch-meta">6 sections</div>
     </div>
@@ -458,11 +437,9 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 16</div>
       <div class="ch-body">
-        <div class="ch-title">Is Agentic Programming Turing Complete?</div>
+        <div class="ch-title"><a href="ch16.html">Is Agentic Programming Turing Complete?</a></div>
         <div class="ch-subtitle">The Theoretical Foundation of the Prompt as Program</div>
-        <div class="ch-links">
-          <a href="ch16.html">Read →</a>
-        </div>
+        <p class="ch-abstract">Examines whether the prompt–tool–loop system is Turing complete, and what theoretical guarantees — and hard limits — that confers on programs written in natural language.</p>
       </div>
       <div class="ch-meta">5 sections</div>
     </div>
@@ -470,10 +447,10 @@
     <div class="chapter-row">
       <div class="ch-num">Ch 17</div>
       <div class="ch-body">
-        <div class="ch-title">The Orchestrator of Talents</div>
+        <div class="ch-title"><a href="ch17.html">The Orchestrator of Talents</a></div>
         <div class="ch-subtitle">The 2026 Programmer's Job Description</div>
+        <p class="ch-abstract">Defines the emerging role of the programmer as orchestrator: someone who composes, evaluates, and governs a team of specialized AI agents toward a shared goal.</p>
         <div class="ch-links">
-          <a href="ch17.html">Read →</a>
           <a href="ch17.html#appendix-a">Appendix A</a>
         </div>
       </div>
