@@ -430,6 +430,89 @@ tbody td:first-child { font-weight: 600; color: var(--navy); }
   letter-spacing: 0.01em;
 }
 
+/* ── Side Navigation ── */
+.side-nav {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 240px;
+  background: var(--gray-100);
+  border-right: 1px solid var(--gray-300);
+  overflow-y: auto;
+  z-index: 90;
+  padding-top: 0;
+  transition: transform 0.25s ease;
+}
+.side-nav-inner {
+  padding: 16px 0 40px;
+}
+.side-nav-book {
+  display: block;
+  padding: 14px 18px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--navy);
+  text-decoration: none;
+  border-bottom: 1px solid var(--gray-300);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.side-nav-book:hover { background: var(--blue-light); color: var(--blue); }
+.side-nav-part {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  padding: 14px 18px 4px;
+}
+.side-nav-link {
+  display: block;
+  padding: 5px 18px;
+  font-size: 0.8rem;
+  color: var(--gray-700);
+  text-decoration: none;
+  line-height: 1.45;
+  transition: background 0.12s, color 0.12s;
+}
+.side-nav-link:hover { background: var(--blue-light); color: var(--blue); }
+.side-nav-link.active {
+  color: var(--blue);
+  font-weight: 700;
+  background: var(--blue-light);
+}
+.side-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 8px;
+  color: var(--navy);
+  font-size: 20px;
+  line-height: 1;
+}
+.side-nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 89;
+}
+.side-nav-overlay.open { display: block; }
+
+/* Wide screens: shift content right of sidebar */
+@media (min-width: 860px) {
+  body { padding-left: 240px; }
+}
+
+/* Narrow screens: sidebar overlays, toggle button visible */
+@media (max-width: 859px) {
+  .side-nav { transform: translateX(-100%); }
+  .side-nav.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.15); }
+  .side-nav-toggle { display: block; }
+}
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   html { font-size: 16px; }

@@ -7,6 +7,37 @@
 <link rel="stylesheet" href="reading.css">
 </head>
 <body>
+<aside class="side-nav" id="sideNav">
+  <div class="side-nav-inner">
+    <a href="index.html" class="side-nav-book">The Agentic<br>Programming Language</a>
+    <a href="introduction.html" class="side-nav-link">Introduction</a>
+    <div class="side-nav-part">Part I &mdash; The New Syntax</div>
+    <a href="ch01.html" class="side-nav-link">Ch 1 &middot; The Language Shift</a>
+    <a href="ch02.html" class="side-nav-link">Ch 2 &middot; The Fundamental Trilogy</a>
+    <div class="side-nav-part">Part II &mdash; The New Memory</div>
+    <a href="ch03.html" class="side-nav-link">Ch 3 &middot; The Context Window</a>
+    <a href="ch04.html" class="side-nav-link">Ch 4 &middot; Context Rot</a>
+    <div class="side-nav-part">Part III &mdash; The New Control Flow</div>
+    <a href="ch05.html" class="side-nav-link">Ch 5 &middot; Semantic Routing</a>
+    <a href="ch06.html" class="side-nav-link">Ch 6 &middot; Parallel Sub-Agents</a>
+    <a href="ch07.html" class="side-nav-link">Ch 7 &middot; The Agentic Loop</a>
+    <div class="side-nav-part">Part IV &mdash; The New Architecture</div>
+    <a href="ch08.html" class="side-nav-link">Ch 8 &middot; Dependency Injection</a>
+    <a href="ch09.html" class="side-nav-link">Ch 9 &middot; SOLID Principles</a>
+    <a href="ch10.html" class="side-nav-link">Ch 10 &middot; Design Patterns</a>
+    <div class="side-nav-part">Part V &mdash; Engineering Practices</div>
+    <a href="ch11.html" class="side-nav-link">Ch 11 &middot; TDD for Agents</a>
+    <a href="ch12.html" class="side-nav-link">Ch 12 &middot; BDD for Agents</a>
+    <a href="ch13.html" class="side-nav-link">Ch 13 &middot; The Debugging Mindset</a>
+    <div class="side-nav-part">Part VI &mdash; Security &amp; Observability</div>
+    <a href="ch14.html" class="side-nav-link">Ch 14 &middot; Prompt Injection</a>
+    <a href="ch15.html" class="side-nav-link">Ch 15 &middot; Observability</a>
+    <div class="side-nav-part">Part VII &mdash; The Future</div>
+    <a href="ch16.html" class="side-nav-link">Ch 16 &middot; Turing Complete?</a>
+    <a href="ch17.html" class="side-nav-link">Ch 17 &middot; Orchestrator of Talents</a>
+  </div>
+</aside>
+<div class="side-nav-overlay" id="sideNavOverlay"></div>
 
 <nav class="top-nav">
   <a href="index.html" class="book-title">The Agentic Programming Language</a>
@@ -145,5 +176,19 @@
 </div><!-- /.page-wrap -->
 
 <footer class="site-copyright">&copy; 2026 Nguyen Ngo &middot; The Agentic Programming Language</footer>
+<script>
+(function(){
+  var btn=document.createElement('button');
+  btn.className='side-nav-toggle';btn.innerHTML='&#9776;';btn.setAttribute('aria-label','Toggle navigation');
+  var topNav=document.querySelector('.top-nav');
+  if(topNav) topNav.insertBefore(btn,topNav.firstChild);
+  var sideNav=document.getElementById('sideNav');
+  var overlay=document.getElementById('sideNavOverlay');
+  btn.addEventListener('click',function(){sideNav.classList.toggle('open');overlay.classList.toggle('open');});
+  overlay.addEventListener('click',function(){sideNav.classList.remove('open');overlay.classList.remove('open');});
+  var path=window.location.pathname.split('/').pop()||'index.html';
+  sideNav.querySelectorAll('a').forEach(function(a){if(a.getAttribute('href')===path)a.classList.add('active');});
+})();
+</script>
 </body>
 </html>
