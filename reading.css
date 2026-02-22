@@ -19,6 +19,8 @@
   --gray-500:   #6b7280;
   --gray-700:   #374151;
   --gray-900:   #111827;
+  --border:     #e5e7eb;
+  --ink-light:  #6b7280;
   --mono: "Cascadia Code", "Fira Code", Consolas, "Courier New", monospace;
   --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
@@ -521,3 +523,148 @@ tbody td:first-child { font-weight: 600; color: var(--navy); }
   .diagram { padding: 20px 14px 16px; }
   .core-principle { padding: 24px 20px; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Dark Theme
+   ══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] {
+  --blue:        #60a5fa;
+  --blue-light:  #1e3358;
+  --green:       #34d399;
+  --green-light: #022c22;
+  --gray-100:    #161b22;
+  --gray-200:    #21262d;
+  --gray-300:    #30363d;
+  --gray-500:    #8b949e;
+  --gray-700:    #c9d1d9;
+  --gray-900:    #f0f6fc;
+  --border:      #30363d;
+  --ink-light:   #8b949e;
+}
+
+[data-theme="dark"] body {
+  background: #0d1117;
+  color: #c9d1d9;
+}
+
+/* Nav */
+[data-theme="dark"] .top-nav {
+  background: rgba(13,17,23,0.97);
+  border-color: #30363d;
+}
+[data-theme="dark"] .top-nav .book-title { color: #c9d1d9; }
+
+/* Side nav */
+[data-theme="dark"] .side-nav { background: #161b22; border-color: #30363d; }
+[data-theme="dark"] .side-nav-book { color: #c9d1d9; border-color: #30363d; }
+[data-theme="dark"] .side-nav-book:hover { background: #1e3358; color: var(--blue); }
+[data-theme="dark"] .side-nav-link { color: #c9d1d9; }
+[data-theme="dark"] .side-nav-link:hover { background: #1e3358; color: var(--blue); }
+[data-theme="dark"] .side-nav-link.active { background: #1e3358; color: var(--blue); }
+[data-theme="dark"] .side-nav-toggle { color: #c9d1d9; }
+[data-theme="dark"] .side-nav-part { color: #8b949e; }
+
+/* Chapter header */
+[data-theme="dark"] .chapter-header { border-color: #30363d; }
+[data-theme="dark"] .chapter-title { color: #c9d1d9; }
+[data-theme="dark"] .chapter-subtitle { color: #8b949e; }
+[data-theme="dark"] .chapter-meta { color: #8b949e; }
+
+/* Prose */
+[data-theme="dark"] .prose h2 { color: #c9d1d9; }
+[data-theme="dark"] .prose h3 { color: #e2e8f0; }
+[data-theme="dark"] .prose strong { color: #f0f6fc; }
+[data-theme="dark"] .prose code {
+  background: #21262d;
+  border-color: #30363d;
+  color: #f472b6;
+}
+[data-theme="dark"] .code-label { color: #8b949e; }
+
+/* Blocks */
+[data-theme="dark"] .callout {
+  background: #1e3358;
+  border-color: var(--blue);
+  color: #bfdbfe;
+}
+[data-theme="dark"] .definition {
+  background: #1c1208;
+  border-color: #f97316;
+  color: #c9d1d9;
+}
+[data-theme="dark"] .definition strong { color: #fb923c; }
+[data-theme="dark"] .prompt-block {
+  background: #022c22;
+  border-color: #34d399;
+  color: #bbf7d0;
+}
+[data-theme="dark"] .core-principle { background: #161b22; border: 1px solid #30363d; }
+
+/* Tables */
+[data-theme="dark"] .table-wrap { border-color: #30363d; }
+[data-theme="dark"] tbody tr { border-color: #30363d; }
+[data-theme="dark"] tbody tr:nth-child(even) { background: #161b22; }
+[data-theme="dark"] tbody td { color: #c9d1d9; }
+[data-theme="dark"] tbody td:first-child { color: #e2e8f0; }
+
+/* Diagram */
+[data-theme="dark"] .diagram { background: #161b22; border-color: #30363d; }
+[data-theme="dark"] .diagram-caption { color: #8b949e; }
+[data-theme="dark"] .diagram-card-title { color: #c9d1d9; }
+[data-theme="dark"] .diagram-card-desc { color: #8b949e; }
+
+/* Credits */
+[data-theme="dark"] .credits-block { background: #161b22; border-color: #30363d; }
+[data-theme="dark"] .credits-name { color: #c9d1d9; }
+
+/* Bottom nav */
+[data-theme="dark"] .bottom-nav a { border-color: #30363d; }
+[data-theme="dark"] .bottom-nav a:hover { border-color: var(--blue); background: #1e3358; }
+[data-theme="dark"] .bottom-nav .nav-direction { color: var(--blue); }
+[data-theme="dark"] .bottom-nav .nav-title { color: #c9d1d9; }
+
+/* Dividers & footer */
+[data-theme="dark"] .section-divider { border-color: #30363d; }
+[data-theme="dark"] .site-copyright { border-color: #30363d; color: #8b949e; }
+
+/* Index-page overrides */
+[data-theme="dark"] .book-hero-title { color: #c9d1d9; }
+[data-theme="dark"] .book-hero-subtitle { color: #8b949e; }
+[data-theme="dark"] .part-name { color: #c9d1d9; }
+[data-theme="dark"] .part-header { border-color: #60a5fa; }
+[data-theme="dark"] .ch-title,
+[data-theme="dark"] .ch-title a { color: #c9d1d9; }
+[data-theme="dark"] .ch-subtitle { color: #8b949e; }
+[data-theme="dark"] .ch-abstract { color: #8b949e; }
+[data-theme="dark"] .chapter-row { border-color: #30363d; }
+[data-theme="dark"] .chapter-row:hover { background: #1e3358; }
+[data-theme="dark"] .index-footer { border-color: #30363d; color: #8b949e; }
+
+/* ── Theme toggle button (appended inside side-nav by theme.js) ── */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: calc(100% - 36px);
+  margin: 16px 18px 8px;
+  padding: 7px 12px;
+  background: none;
+  border: 1px solid var(--gray-300);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  font-family: var(--sans);
+  text-align: left;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.theme-toggle:hover {
+  background: var(--blue-light);
+  color: var(--blue);
+  border-color: var(--blue);
+}
+.theme-toggle-icon { font-style: normal; }
+[data-theme="dark"] .theme-toggle { color: #c9d1d9; border-color: #30363d; }
+[data-theme="dark"] .theme-toggle:hover { background: #1e3358; color: var(--blue); border-color: var(--blue); }
